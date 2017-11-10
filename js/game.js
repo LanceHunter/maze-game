@@ -1,3 +1,6 @@
+//require('./jquery-3.2.1.min.js');
+//require('./materialize.js');
+
 (function() {
 
 //Getting the game div from the page.
@@ -37,7 +40,17 @@ for (i=0; i<100; i++) {
   }
 }
 
-//createBoard();
+createBoard();
+
+function playerPlacement() {
+  let enemyPixel = Math.floor(Math.random()*100);
+  return enemyPixel;
+}
+
+
+
+
+//The following are functions dealing with Materialize and links on the page outside the actual game.
 
 //Getting the 'High Scores' and 'How to play' links.
 let highScores = $('#highScores');
@@ -51,6 +64,13 @@ highScores.click(function() {
 about.click(function() {
   Materialize.toast(`When you press start, you will be placed on a blank board with an enemy. You have sixty seconds to draw walls and create a maze between yourself and the enemy. When you are finished, the enemy has thirty seconds to reach you. Be careful not to wall yourself off!`, 15000)
 });
+
+module.exports = {
+  createBoard,
+  gameStart,
+  newBoard,
+  playerPlacement
+}
 
 
 })();
