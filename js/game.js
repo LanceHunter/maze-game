@@ -65,12 +65,11 @@ about.click(function() {
   Materialize.toast(`When you press start, you will be placed on a blank board with an enemy. You have sixty seconds to draw walls and create a maze between yourself and the enemy. When you are finished, the enemy has thirty seconds to reach you. Be careful not to wall yourself off!`, 15000)
 });
 
+})();
+
 module.exports = {
   createBoard,
   gameStart,
   newBoard,
   playerPlacement
 }
-
-
-})();
