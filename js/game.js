@@ -4,23 +4,40 @@
 let game = $('#game');
 
 function gameStart() {
-  
+
+}
+
+//Let's create the maze board's div.
+function createBoard() {
+  let board = document.createElement('div');
+  board.classList.add('board');
+  board.id = `board`;
+  board.style.width="400px";
+  board.style.height="400px";
+  board.style.border="none";
+  board.style.display="flex";
+  board.style.flexWrap="wrap";
+  board.style.backgroundColor="white";
+  game.append(board);
+  newBoard();
 }
 
 
-//Let's see if we can add basic pixels to it.
+//Let's see if we can add basic pixels to the board div.
+function newBoard() {
 for (i=0; i<100; i++) {
   let pixel = document.createElement('div');
   pixel.classList.add('pixel');
   pixel.id = `pixel${i}`;
-  pixel.style.width="9px";
-  pixel.style.height="9px";
+  pixel.style.width="40px";
+  pixel.style.height="40px";
   pixel.style.border="1px solid black";
   pixel.style.alignContent="flex-start";
-  pixel.style.backgroundColor="white";
-  game.append(pixel);
+  board.append(pixel);
+  }
 }
 
+//createBoard();
 
 //Getting the 'High Scores' and 'How to play' links.
 let highScores = $('#highScores');
