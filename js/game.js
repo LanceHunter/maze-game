@@ -42,11 +42,19 @@ for (i=0; i<100; i++) {
 
 createBoard();
 
-function playerPlacement() {
+function piecePlacement() {
   let enemyPixel = Math.floor(Math.random()*100);
-  return enemyPixel;
+  let enemyBuffer = [(enemyPixel-1),(enemyPixel+1),(enemyPixel-11),(enemyPixel-10),(enemyPixel-9),(enemyPixel+9),(enemyPixel+10),(enemyPixel+11)];
+  console.log(enemyPixel);
+  console.log(enemyBuffer);
+  let playerPixel = Math.floor(Math.random()*100);
+  while (enemyBuffer.includes(playerPixel)) {
+    playerPixel = Math.floor(Math.random()*100);
+  }
+  console.log(playerPixel);
 }
 
+piecePlacement();
 
 
 
@@ -71,5 +79,5 @@ module.exports = {
   createBoard,
   gameStart,
   newBoard,
-  playerPlacement
+  piecePlacement
 }
