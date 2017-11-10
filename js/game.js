@@ -3,6 +3,10 @@
 //Getting the game div from the page.
 let game = $('#game');
 
+function gameStart() {
+  
+}
+
 
 //Let's see if we can add basic pixels to it.
 for (i=0; i<100; i++) {
@@ -12,6 +16,8 @@ for (i=0; i<100; i++) {
   pixel.style.width="9px";
   pixel.style.height="9px";
   pixel.style.border="1px solid black";
+  pixel.style.alignContent="flex-start";
+  pixel.style.backgroundColor="white";
   game.append(pixel);
 }
 

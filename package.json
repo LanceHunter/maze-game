@@ -1,0 +1,32 @@
+{
+  "name": "mazegame",
+  "version": "1.0.0",
+  "description": "A web-based maze game",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LanceHunter/maze-game.git"
+  },
+  "keywords": [
+    "game",
+    "maze",
+    "project",
+    "galvanize"
+  ],
+  "author": "R. Lance Hunter",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/LanceHunter/maze-game/issues"
+  },
+  "homepage": "https://github.com/LanceHunter/maze-game#readme",
+  "devDependencies": {
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0"
+  }
+}
