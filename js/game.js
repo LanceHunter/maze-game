@@ -5,10 +5,10 @@ let game = $('#game');
 
 
 
-//This function starts the game, creating the board, placing the player and enemy pixels, and starting the timer.
+//This function starts the game, creating the board, placing the player and enemy pixels, starting the timer, and calling the function that allows player to draw walls.
 function startGame() {
   createBoard();
-  createTimer();
+  createTimer(60000);
   window.setTimeout(turnIsOver, 60000);
   let startingPlaces = piecePlacement();
   let playerStart = $(`#pixel${startingPlaces[0]}`);
@@ -93,21 +93,26 @@ function turnIsOver() {
   alert('Time is up!');
 }
 
-function createTimer() {
+//This function puts a timer on the page below the board so player can see how much time they of the enemy have left in their turn. It takes in an argument of how much time is left, which will either be 60000 for player or 30000 for enemy.
+function createTimer(timeLeft) {
   let visibleTimer = document.createElement('h1');
   game.append(visibleTimer);
   visibleTimer.classList.add('timer');
   visibleTimer.classList.add('center');
   visibleTimer.classList.id = `timer`;
-  let timeLeft = 60000;
   let counter = setInterval(function() {
-    if (timeLeft>=0) {
+    if (timeLeft>=1000) {
       visibleTimer.innerText = `${(timeLeft/1000).toPrecision(3)} seconds`;
+      timeLeft = timeLeft-10;
+    } else if (timeLeft>=100) {
+      visibleTimer.innerText = `${(timeLeft/1000).toPrecision(2)} seconds`;
+      timeLeft = timeLeft-10;
+    } else if (timeLeft>=0) {
+      visibleTimer.innerText = `${(timeLeft/1000).toPrecision(1)} seconds`;
       timeLeft = timeLeft-10;
     } else {
       clearInterval(counter);
     }
-    console.log("This is running");
   }, 10);
 }
 
