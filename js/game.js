@@ -1,12 +1,10 @@
-//require('./jquery-3.2.1.min.js');
-//require('./materialize.js');
-
 (function() {
 
 //Getting the game div from the page.
 let game = $('#game');
 
 function gameStart() {
+  startScreen();
 
 }
 
@@ -15,12 +13,7 @@ function createBoard() {
   let board = document.createElement('div');
   board.classList.add('board');
   board.id = `board`;
-  board.style.width="400px";
-  board.style.height="400px";
-  board.style.border="none";
-  board.style.display="flex";
-  board.style.flexWrap="wrap";
-  board.style.backgroundColor="white";
+//  board.style.backgroundColor="white";
   game.append(board);
   newBoard();
 }
@@ -32,15 +25,42 @@ for (i=0; i<100; i++) {
   let pixel = document.createElement('div');
   pixel.classList.add('pixel');
   pixel.id = `pixel${i}`;
-  pixel.style.width="40px";
-  pixel.style.height="40px";
-  pixel.style.border="1px solid black";
-  pixel.style.alignContent="flex-start";
   board.append(pixel);
   }
 }
 
-createBoard();
+//This function creates the start screen with the "start" and "options" buttons.
+function startScreen() {
+  let startPage = document.createElement('div');
+  startPage.classList.add('startPage');
+  startPage.classList.add('col');
+  startPage.classList.add('s12');
+  startPage.classList.add('m12');
+  startPage.classList.add('l12');
+  startPage.classList.add('valign-wrapper');
+  startPage.id = `startPage`;
+  game.append(startPage);
+  let startButton = document.createElement('div');
+  startButton.classList.add('startButton');
+  startButton.classList.add('row');
+  startButton.classList.add('red');
+  startButton.classList.add('darken-1');
+  startButton.innerText = `Start`;
+  let optionButton = document.createElement('div');
+  optionButton.classList.add('optionButton');
+  optionButton.classList.add('row');
+  optionButton.classList.add('orange');
+  optionButton.classList.add('darken-1');
+  optionButton.innerText = `Options`;
+  startPage.prepend(startButton);
+  startPage.append(optionButton);
+
+//  let $startButton = $('startButton');
+}
+
+startScreen();
+//createBoard();
+
 
 function piecePlacement() {
   let enemyPixel = Math.floor(Math.random()*100);
@@ -70,14 +90,7 @@ highScores.click(function() {
 });
 
 about.click(function() {
-  Materialize.toast(`When you press start, you will be placed on a blank board with an enemy. You have sixty seconds to draw walls and create a maze between yourself and the enemy. When you are finished, the enemy has thirty seconds to reach you. Be careful not to wall yourself off!`, 15000)
+  Materialize.toast(`You have sixty seconds to draw walls and create a maze between yourself and the enemy. When you are finished, the enemy has thirty seconds to reach you. Be careful not to wall yourself off!`, 15000)
 });
 
 })();
-
-module.exports = {
-  createBoard,
-  gameStart,
-  newBoard,
-  piecePlacement
-}
