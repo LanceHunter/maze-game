@@ -100,27 +100,30 @@ function turnIsOver() {
 
 //This function will put all the pixels into an array, marked as either having a wall (true), no wall (false), player (the string 'player'), player (the string 'enemy').
 function passWallsToArray() {
-  for (i=0; i<100; i++) {
-    let wallsArray = [];
-    if ($(`#pixel${i}`).hasClass('wall')) {
-      wallsArray.push([i,true]);
-      console.log(`Pixel ${i} is a wall`);
-    } else if ($(`#pixel${i}`).hasClass('player')) {
-      wallsArray.push([[i,'player']]);
-      console.log(`Pixel ${i} is the player`);
-    } else if ($(`#pixel${i}`).hasClass('enemy')) {
-      wallsArray.push([[i,'enemy']]);
-      console.log(`Pixel ${i} is the enemy`);
-    } else {
-      wallsArray.push([i,false]);
-      console.log(`Pixel ${i} is NOT a wall`);
+  let wallsArray = [];
+  for (i=0; i<10; i++) {
+    let rowArray = [];
+    for (j=0; j<10; j++) {
+      let pixelNum = (i*10)+(j);
+      if ($(`#pixel${pixelNum}`).hasClass('wall')) {
+        rowArray.push([1,pixelNum]);
+      } else if ($(`#pixel${pixelNum}`).hasClass('player')) {
+        rowArray.push([2,pixelNum]);
+      } else if ($(`#pixel${pixelNum}`).hasClass('enemy')) {
+        rowArray.push([3,pixelNum]);
+      } else {
+        rowArray.push([0,pixelNum]);
+      }
     }
+    wallsArray.push(rowArray);
   }
+  console.log(wallsArray);
   return(wallsArray);
 }
 
+//This is where the system will verify that there is a valid path from the enemy to the player.
 function verifyValidPath() {
-  
+
 }
 
 
