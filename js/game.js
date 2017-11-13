@@ -4,14 +4,15 @@
 let game = $('#game');
 
 let difficulty = 0;
+let winner = 1;
 
 
 //This function starts the game, creating the board, placing the player and enemy pixels, starting the timer, and calling the function that allows player to draw walls.
 function startGame() {
+  let startingPlaces = piecePlacement();
   createBoard();
   createTimer(10000); //Note this is set to 10 seconds for now.
   window.setTimeout(turnIsOver, 10000); //Note this is set to 10 seconds for now.
-  let startingPlaces = piecePlacement();
   let playerStart = $(`#pixel${startingPlaces[0]}`);
   let enemyStart = $(`#pixel${startingPlaces[1]}`);
   playerStart.addClass('player');
@@ -91,7 +92,7 @@ for (i=0; i<100; i++) {
   }
 }
 
-//This function shows that the player's time is over. Currently just showing a notification.
+//This function shows that the player's time is over. Calls functions to pass the walls to an array and verify that there is a valid path (eventually). Blanks out the screen and then tells player 2 that it is their turn.
 function turnIsOver() {
   board.removeEventListener('click', makeWall);
   let tempArray = passWallsToArray(); //This array holds the returned array.
@@ -101,18 +102,70 @@ function turnIsOver() {
   //Shows player a "Time Up" screen
   let timeUpScreen = document.createElement('div');
   timeUpScreen.classList.add('timeUpScreen');
-  timeUpScreen.classList.add('center');
-  timeUpScreen.classList.add('col');
-  timeUpScreen.classList.add('s12');
-  timeUpScreen.classList.add('m12');
-  timeUpScreen.classList.add('l12');
   timeUpScreen.id = `timeUpScreen`;
-  timeUpScreen.innerText = 'Time is up! Player 2 click to begin.';
+  timeUpScreen.innerText = 'Time is up!';
   game.prepend(timeUpScreen);
-  
+  window.setTimeout(function() {
+    timeUpScreen.innerText = 'Player 2 click to begin';
+    timeUpScreen.addEventListener('click', playerTwoTurn);
+  }, 3000);
 }
 
-//This function will put all the pixels into an 2d array, each marked as either having a wall (1) or no wall (3). It returns that 2d array (wallsArray). It will also return the grid location of enemy (enemyPoint) and player (playerPoint).
+function playerTwoTurn() {
+  timeUpScreen.classList.toggle('hide');
+  board.classList.toggle('hide');
+  createTimer(10000); //Note this is temporarily set to 10 seconds.
+  window.setTimeout(gameIsOver, 10000); //Note this is temporarily set to 10 seconds
+  board.addEventListener('click', makeEnemyLine);
+}
+
+function makeEnemyLine() {
+  let square = document.getElementById(event.target.id);
+  //The following IF statement makes sure the player isn't selecting the actual player or enemy pixel.
+  let enemyBuffer = [];
+  for (i=0; i<100; i++) {
+    if ($(`#pixel${i}`).hasClass('enemy')) {
+      enemyBuffer.push(`pixel${(i)}`);
+      enemyBuffer.push(`pixel${(i-1)}`);
+      enemyBuffer.push(`pixel${(i+1)}`);
+      enemyBuffer.push(`pixel${(i-11)}`);
+      enemyBuffer.push(`pixel${(i-10)}`);
+      enemyBuffer.push(`pixel${(i-9)}`);
+      enemyBuffer.push(`pixel${(i+9)}`);
+      enemyBuffer.push(`pixel${(i+10)}`);
+      enemyBuffer.push(`pixel${(i+11)}`);
+    }
+  }
+  console.log(enemyBuffer);
+  if ((!($(`#${event.target.id}`).hasClass('wall'))) && (enemyBuffer.includes(event.target.id))) {
+    square.classList.add('enemy');
+
+  }
+  if (($(`#${event.target.id}`).hasClass('player')) && (enemyBuffer.includes(event.target.id))) {
+    console.log('Player 2 Wins!');
+    winner = 2;
+    gameIsOver();
+  }
+}
+
+
+function gameIsOver() {
+  board.removeEventListener('click', makeEnemyLine);
+  timeUpScreen.removeEventListener('click', playerTwoTurn);
+  board.classList.toggle('hide');
+  $('#timer').remove();
+  if (winner === 1) {
+    timeUpScreen.classList.toggle('hide');
+    timeUpScreen.style.backgroundColor = "#4caf50";
+    timeUpScreen.innerText = "Player 1 Wins!"
+  } else {
+    timeUpScreen.classList.toggle('hide');
+    timeUpScreen.style.backgroundColor = "#e53935";
+    timeUpScreen.innerText = "Player 2 Wins!"
+  }
+}
+
+//This function will put all the pixels into an 2d array, each marked as either having a wall (1) or no wall (0). It returns that 2d array (wallsArray). It will also return the grid location of enemy (enemyPoint) and player (playerPoint).
 function passWallsToArray() {
   let wallsArray = [];
   let enemyPoint = [];
@@ -157,7 +210,7 @@ function createTimer(timeLeft) {
   game.append(visibleTimer);
   visibleTimer.classList.add('timer');
   visibleTimer.classList.add('center');
-  visibleTimer.classList.id = `timer`;
+  visibleTimer.id = `timer`;
   let counter = setInterval(function() {
     if (timeLeft>=1000) {
       visibleTimer.innerText = `${(timeLeft/1000).toPrecision(3)} seconds`;
@@ -170,6 +223,7 @@ function createTimer(timeLeft) {
       timeLeft = timeLeft-10;
     } else {
       clearInterval(counter);
+      $('#timer').remove();
     }
   }, 10);
 }
