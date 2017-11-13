@@ -35,9 +35,23 @@ main {
 .optionButton {
   border-radius: 100px;
   padding: 100px;
+  background-color: #e53935;
 }
 
 .startButton {
   border-radius: 100px;
   padding: 100px;
+  background-color: #4caf50;
+}
+
+.player {
+  background-color: #4caf50;
+}
+
+.enemy {
+  background-color: #e53935;
+}
+
+.timer {
+  margins:auto;
 }

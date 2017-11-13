@@ -8,13 +8,14 @@ let game = $('#game');
 //This function starts the game, creating the board, placing the player and enemy pixels, and starting the timer.
 function startGame() {
   createBoard();
-  window.setTimeOut(slowAlert, 60000);
+  createTimer();
+  window.setTimeout(turnIsOver, 60000);
   let startingPlaces = piecePlacement();
   let playerStart = $(`#pixel${startingPlaces[0]}`);
   let enemyStart = $(`#pixel${startingPlaces[1]}`);
-  playerStart.addClass('green');
-  enemyStart.addClass('red');
-  enemyStart.addClass('darken-1');
+  playerStart.addClass('player');
+  enemyStart.addClass('enemy');
+  drawNow();
 }
 
 //This function creates the start screen with the "start" and "options" buttons.
@@ -34,8 +35,6 @@ function startScreen() {
   let startButton = document.createElement('div');
   startButton.classList.add('startButton');
   startButton.classList.add('center');
-  startButton.classList.add('green');
-  startButton.classList.add('darken-1');
   startButton.id = `startButton`;
   startButton.innerText = `Start`;
 
@@ -43,8 +42,6 @@ function startScreen() {
   let optionButton = document.createElement('div');
   optionButton.classList.add('optionButton');
   optionButton.classList.add('center');
-  optionButton.classList.add('red');
-  optionButton.classList.add('darken-1');
   optionButton.id = `optionButton`;
   optionButton.innerText = `Options`;
 
@@ -72,7 +69,6 @@ function startScreen() {
   });
 }
 
-
 //Let's create the maze board's div.
 function createBoard() {
   let board = document.createElement('div');
@@ -82,8 +78,7 @@ function createBoard() {
   newBoard();
 }
 
-
-//This function creates the blank board.
+//This function adds the pixels of the blank maze to the maze board.
 function newBoard() {
 for (i=0; i<100; i++) {
   let pixel = document.createElement('div');
@@ -92,6 +87,30 @@ for (i=0; i<100; i++) {
   board.append(pixel);
   }
 }
+
+//This function shows that the player's time is over. Currently just showing a notification.
+function turnIsOver() {
+  alert('Time is up!');
+}
+
+function createTimer() {
+  let visibleTimer = document.createElement('h1');
+  game.append(visibleTimer);
+  visibleTimer.classList.add('timer');
+  visibleTimer.classList.add('center');
+  visibleTimer.classList.id = `timer`;
+  let timeLeft = 60000;
+  let counter = setInterval(function() {
+    if (timeLeft>=0) {
+      visibleTimer.innerText = `${(timeLeft/1000).toPrecision(3)} seconds`;
+      timeLeft = timeLeft-10;
+    } else {
+      clearInterval(counter);
+    }
+    console.log("This is running");
+  }, 10);
+}
+
 
 
 //startScreen();
