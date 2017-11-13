@@ -9,8 +9,8 @@ let difficulty = 0;
 //This function starts the game, creating the board, placing the player and enemy pixels, starting the timer, and calling the function that allows player to draw walls.
 function startGame() {
   createBoard();
-  createTimer(60000);
-  window.setTimeout(turnIsOver, 60000);
+  createTimer(10000); //Note this is set to 10 seconds for now.
+  window.setTimeout(turnIsOver, 10000); //Note this is set to 10 seconds for now.
   let startingPlaces = piecePlacement();
   let playerStart = $(`#pixel${startingPlaces[0]}`);
   let enemyStart = $(`#pixel${startingPlaces[1]}`);
@@ -98,31 +98,38 @@ function turnIsOver() {
   verifyValidPath(passWallsToArray());
 }
 
-//This function will put all the pixels into an array, marked as either having a wall (true), no wall (false), player (the string 'player'), player (the string 'enemy').
+//This function will put all the pixels into an 2d array, each marked as either having a wall (1) or no wall (0). It returns that 2d array (wallsArray). It will also return the grid location of enemy (enemyPoint) and player (playerPoint).
 function passWallsToArray() {
   let wallsArray = [];
+  let enemyPoint = [];
+  let playerPoint = [];
   for (i=0; i<10; i++) {
     let rowArray = [];
     for (j=0; j<10; j++) {
       let pixelNum = (i*10)+(j);
       if ($(`#pixel${pixelNum}`).hasClass('wall')) {
-        rowArray.push([1,pixelNum]);
+        rowArray.push(1);
       } else if ($(`#pixel${pixelNum}`).hasClass('player')) {
-        rowArray.push([2,pixelNum]);
+        rowArray.push(0);
+        playerPoint.push(i);
+        playerPoint.push(j);
       } else if ($(`#pixel${pixelNum}`).hasClass('enemy')) {
-        rowArray.push([3,pixelNum]);
+        enemyPoint.push(i);
+        enemyPoint.push(j);
+        rowArray.push(0);
       } else {
-        rowArray.push([0,pixelNum]);
+        rowArray.push(0);
       }
     }
     wallsArray.push(rowArray);
   }
-  console.log(wallsArray);
-  return(wallsArray);
+  console.log(wallsArray + "start " + enemyPoint + " and end " + playerPoint);
+  return(wallsArray, enemyPoint, playerPoint);
 }
 
-//This is where the system will verify that there is a valid path from the enemy to the player.
-function verifyValidPath() {
+//This is where the system will verify that there is a valid path from the enemy to the player. We're using the A* pathfinding algorithm.
+function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
+  let easystar = new EasyStar.js();
 
 }
 
