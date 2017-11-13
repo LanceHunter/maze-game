@@ -93,12 +93,26 @@ for (i=0; i<100; i++) {
 
 //This function shows that the player's time is over. Currently just showing a notification.
 function turnIsOver() {
-  alert('Time is up!');
   board.removeEventListener('click', makeWall);
-  verifyValidPath(passWallsToArray());
+  let tempArray = passWallsToArray(); //This array holds the returned array.
+  verifyValidPath(tempArray[0], tempArray[1], tempArray[2]);
+  //Hides the board so it can't be seen by player 2.
+  board.classList.toggle('hide');
+  //Shows player a "Time Up" screen
+  let timeUpScreen = document.createElement('div');
+  timeUpScreen.classList.add('timeUpScreen');
+  timeUpScreen.classList.add('center');
+  timeUpScreen.classList.add('col');
+  timeUpScreen.classList.add('s12');
+  timeUpScreen.classList.add('m12');
+  timeUpScreen.classList.add('l12');
+  timeUpScreen.id = `timeUpScreen`;
+  timeUpScreen.innerText = 'Time is up! Player 2 click to begin.';
+  game.prepend(timeUpScreen);
+  
 }
 
-//This function will put all the pixels into an 2d array, each marked as either having a wall (1) or no wall (0). It returns that 2d array (wallsArray). It will also return the grid location of enemy (enemyPoint) and player (playerPoint).
+//This function will put all the pixels into an 2d array, each marked as either having a wall (1) or no wall (3). It returns that 2d array (wallsArray). It will also return the grid location of enemy (enemyPoint) and player (playerPoint).
 function passWallsToArray() {
   let wallsArray = [];
   let enemyPoint = [];
@@ -110,27 +124,30 @@ function passWallsToArray() {
       if ($(`#pixel${pixelNum}`).hasClass('wall')) {
         rowArray.push(1);
       } else if ($(`#pixel${pixelNum}`).hasClass('player')) {
-        rowArray.push(0);
+        rowArray.push(2);
         playerPoint.push(i);
         playerPoint.push(j);
       } else if ($(`#pixel${pixelNum}`).hasClass('enemy')) {
         enemyPoint.push(i);
         enemyPoint.push(j);
-        rowArray.push(0);
+        rowArray.push(2);
       } else {
         rowArray.push(0);
       }
     }
     wallsArray.push(rowArray);
   }
-  console.log(wallsArray + "start " + enemyPoint + " and end " + playerPoint);
-  return(wallsArray, enemyPoint, playerPoint);
+//  console.log(wallsArray);
+//  console.log("start " + enemyPoint + " and end " + playerPoint);
+  return([wallsArray, enemyPoint, playerPoint]);
 }
 
-//This is where the system will verify that there is a valid path from the enemy to the player. We're using the A* pathfinding algorithm.
+//This is where the system will verify that there is a valid path from the enemy to the player.
 function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
-  let easystar = new EasyStar.js();
-
+  console.log(wallsArray);
+  console.log("Enemy point " + enemyPoint[0], ' ', + enemyPoint[1]);
+  console.log("Player point " + playerPoint[0], ' ', + playerPoint[1]);
+  //I'll do more on this later.
 }
 
 
@@ -171,19 +188,20 @@ function piecePlacement() {
 //This function adds the event listener for clicking squares to create walls.
 function drawNow() {
   board.addEventListener('click', makeWall);
-//  palette.addEventListener('click', selectColor);
 }
 
 //This is the function called by the event listener in drawNow().
 function makeWall() {
   let square = document.getElementById(event.target.id);
-  square.classList.toggle('wall');
+  //The following IF statement makes sure the player isn't selecting the actual player or enemy pixel.
+  if (!($(`#${event.target.id}`).hasClass('player')) && !($(`#${event.target.id}`).hasClass('enemy'))) {
+    square.classList.toggle('wall');
+  }
 }
 
 
 
 startScreen();
-//startGame();
 
 
 
@@ -202,5 +220,6 @@ highScores.click(function() {
 about.click(function() {
   Materialize.toast(`You have sixty seconds to draw walls and create a maze between yourself and the enemy. When you are finished, the enemy has thirty seconds to reach you. Be careful not to wall yourself off!`, 15000);
 });
+
 
 })();

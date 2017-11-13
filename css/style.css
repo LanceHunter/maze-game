@@ -59,3 +59,13 @@ main {
 .wall {
   background-color: #000000;
 }
+
+.timeUpScreen {
+  width: 500px;
+  height: 500px;
+  border: none;
+  display: flex;
+  flex-wrap: wrap;
+  margin: auto;
+  background-color: #e53935;
+}
