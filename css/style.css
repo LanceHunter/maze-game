@@ -11,7 +11,6 @@ main {
 }
 
 .startPage {
-/*  width: 600px; */
   height: 600px;
   background-color: white;
 }
@@ -34,11 +33,11 @@ main {
 }
 
 .optionButton {
-  border-radius: 10px;
+  border-radius: 100px;
   padding: 100px;
 }
 
 .startButton {
-  border-radius: 10px;
+  border-radius: 100px;
   padding: 100px;
 }
