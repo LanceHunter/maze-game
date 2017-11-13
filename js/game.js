@@ -3,6 +3,7 @@
 //Getting the game div from the page.
 let game = $('#game');
 
+let difficulty = 0;
 
 
 //This function starts the game, creating the board, placing the player and enemy pixels, starting the timer, and calling the function that allows player to draw walls.
@@ -59,7 +60,9 @@ function startScreen() {
   //Creating a click listener for the start button that begins the game.
   let $startButton = $('#startButton');
   $startButton.click(function() {
+    startPage.classList.toggle('hide');
     console.log('Start Button Pressed!');
+    startGame();
   });
 
   //Creating a click listener for the options button that brings up the options screen.
@@ -91,7 +94,35 @@ for (i=0; i<100; i++) {
 //This function shows that the player's time is over. Currently just showing a notification.
 function turnIsOver() {
   alert('Time is up!');
+  board.removeEventListener('click', makeWall);
+  verifyValidPath(passWallsToArray());
 }
+
+//This function will put all the pixels into an array, marked as either having a wall (true), no wall (false), player (the string 'player'), player (the string 'enemy').
+function passWallsToArray() {
+  for (i=0; i<100; i++) {
+    let wallsArray = [];
+    if ($(`#pixel${i}`).hasClass('wall')) {
+      wallsArray.push([i,true]);
+      console.log(`Pixel ${i} is a wall`);
+    } else if ($(`#pixel${i}`).hasClass('player')) {
+      wallsArray.push([[i,'player']]);
+      console.log(`Pixel ${i} is the player`);
+    } else if ($(`#pixel${i}`).hasClass('enemy')) {
+      wallsArray.push([[i,'enemy']]);
+      console.log(`Pixel ${i} is the enemy`);
+    } else {
+      wallsArray.push([i,false]);
+      console.log(`Pixel ${i} is NOT a wall`);
+    }
+  }
+  return(wallsArray);
+}
+
+function verifyValidPath() {
+  
+}
+
 
 //This function puts a timer on the page below the board so player can see how much time they of the enemy have left in their turn. It takes in an argument of how much time is left, which will either be 60000 for player or 30000 for enemy.
 function createTimer(timeLeft) {
@@ -116,24 +147,33 @@ function createTimer(timeLeft) {
   }, 10);
 }
 
-
-
-//startScreen();
-startGame();
-
-
 //This function determines where the enemy will be on the board, makes a buffer zone so the player isn't put right besides the enemy, and then determines where the player is places. If then returns an array with two elements, the player's location and the enemy's location.
 function piecePlacement() {
   let enemyPixel = Math.floor(Math.random()*100);
   let enemyBuffer = [(enemyPixel-1),(enemyPixel+1),(enemyPixel-11),(enemyPixel-10),(enemyPixel-9),(enemyPixel+9),(enemyPixel+10),(enemyPixel+11)];
-//  console.log(enemyPixel);
-//  console.log(enemyBuffer);
   let playerPixel = Math.floor(Math.random()*100);
   while (enemyBuffer.includes(playerPixel)) {
     playerPixel = Math.floor(Math.random()*100);
   }
   return([playerPixel,enemyPixel]);
 }
+
+//This function adds the event listener for clicking squares to create walls.
+function drawNow() {
+  board.addEventListener('click', makeWall);
+//  palette.addEventListener('click', selectColor);
+}
+
+//This is the function called by the event listener in drawNow().
+function makeWall() {
+  let square = document.getElementById(event.target.id);
+  square.classList.toggle('wall');
+}
+
+
+
+startScreen();
+//startGame();
 
 
 
@@ -146,11 +186,11 @@ let about = $('#about');
 
 //Displays the high scores in a toast when the High Scores link is clicked.
 highScores.click(function() {
-  Materialize.toast(`<ol><h2>High Scores</h2><li>Testing</li><li>Still Testing</li></ol>`, 15000)
+  Materialize.toast(`<ol><h2>High Scores</h2><li>Testing</li><li>Still Testing</li></ol>`, 15000);
 });
 
 about.click(function() {
-  Materialize.toast(`You have sixty seconds to draw walls and create a maze between yourself and the enemy. When you are finished, the enemy has thirty seconds to reach you. Be careful not to wall yourself off!`, 15000)
+  Materialize.toast(`You have sixty seconds to draw walls and create a maze between yourself and the enemy. When you are finished, the enemy has thirty seconds to reach you. Be careful not to wall yourself off!`, 15000);
 });
 
 })();

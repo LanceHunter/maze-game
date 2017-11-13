@@ -55,3 +55,7 @@ main {
 .timer {
   margins:auto;
 }
+
+.wall {
+  background-color: #000000;
+}
