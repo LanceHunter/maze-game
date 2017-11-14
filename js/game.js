@@ -19,7 +19,7 @@ Function 1 - startScreen()
 ===========
 
 Function 2 - startGame()
-  This function starts the game, calling the function that places the player and enemy pixels - piecePlacement(), calling the function that starts the timer - createTimer() (and passing it 60 seconds), calling the function that puts a timer display on the screen turnIsOver() (also passing it 60 seconds), marks the player and the enemy pixels on the board, and calls the function that allows player to draw walls.
+  This function starts the game, calling the function that places the player and enemy pixels - piecePlacement(), calling the function that starts the timer - createTimer() (and passing it 60 seconds), calling the function that puts a timer display on the screen turnIsOver() (also passing it 60 seconds), marks the player and the enemy pixels on the board, and calls the function that allows player to draw walls - drawNow().
 
 ===========
 
@@ -27,12 +27,78 @@ Function 3 - createBoard()
 
   This function create the maze board's div and calls the function that will add the pixels to the board - newBoard().
 
-  ===========
+===========
 
 Function 4 - newBoard()
 
-  This function adds the pixels of the blank maze to the maze board. It gives each pixel the id 'pixel(i)' where i is from 0 to the last number.
+  This function adds the pixels of the blank maze to the maze board. It gives each pixel the id 'pixel(i)' where i is from 0 to the last number. This calls no functions.
 
+===========
+
+Function 5 - turnIsOver()
+
+  This function shows that the player's time is over. It removes the eventListener that allows walls to be drawn. It then calls functions to pass the walls to an array - passWallsToArray() - and verify that there is a valid path - verifyValidPath(). It also blanks out the screen so neither player can see what has been drawn. Then, after 3 seconds it tells player 2 that it is their turn and puts an eventListener for a click that calls - playerTwoTurn().
+
+===========
+
+Function 6 - playerTwoTurn()
+
+  This function hides the timeUpScreen and makes the board visible again. If then calls the function to show the player a timer - createTimer(), and passes it 30 seconds. It also has a window.setTimeout that calls the function gameIsOver() after 30 seconds. Finally, it adds an eventListener that calls the function - makeEnemyLine() when the board is clicked.
+
+===========
+
+Function 7 - makeEnemyLine()
+
+  This function allows the enemy (player 2) to draw their line to the player's pixel. It first creates an array of the pixels that are directly around the original enemy pixel. If the enemy has clicked on any of the pixels that are in the array, that pixel is then part of the enemy's "line" and the pixels around that new enemy pixel are added to the array. If enemy's pixel reaches the player pixel before the time is up, gameisOver() is called.
+
+===========
+
+Function 8 - gameIsOver()
+
+  This function removes the eventListener for the clicks on the board that allows enemy lines to be made, and the eventListener on the timeUpScreen that starts player 2's turn. It also hides the board and removes the timer. Then, if the global variable "winner" is "1", the player 1 wins screen is displayed. If global variable "winner" is "2", the player 2 wins screen is displayed.
+
+===========
+
+Function 9 - passWallsToArray()
+
+  This function will put all the pixels into an 2d array, each marked as either having a wall (1) or no wall (0). It returns that 2d array (wallsArray). It will also return an array of the grid location of enemy (enemyPoint) and an array the grid location of player (playerPoint).
+
+
+===========
+
+Function 10 - verifyValidPath()
+
+  This is where the system will verify that there is a valid path from the enemy to the player. It takes 3 arguments, the 2d array of the grid, the array of the enemy's location, and the array of the player's location. (Pathfinding algorithm to-be-written later today.)
+
+===========
+
+Function 11 - createTimer()
+
+  This function puts a timer on the page below the board so player can see how much time they of the enemy have left in their turn. It takes in an argument of how much time is left, which will either be 60000 for player or 30000 for enemy.
+
+===========
+
+Function 12 - piecePlacement()
+
+  This function determines where the enemy will be on the board, makes a buffer zone so the player isn't put right besides the enemy, and then determines where the player is placed. If then returns an array with two numbers from 1 to 100, the player's location and the enemy's location.
+
+===========
+
+Function 13 - drawNow()
+
+  This function adds the event listener for clicking squares and calls the function makeWall() for each of them.
+
+===========
+
+Function 14 - makeWall()
+
+  This is the function called by the event listener in drawNow(). It toggles a wall on or off for whichever pixel the player has clicked, and makes sure that the player hasn't clicked their own pixel or the enemy pixel.
+
+===========
+
+Epilogue - Functions and variables that deal with clicks outside of the game. Mostly Materialize toasts.
+
+===========
 */
 
 (function() {
@@ -126,7 +192,7 @@ function createBoard() {
 
 //Function 4 - This function adds the pixels of the blank maze to the maze board.
 function newBoard() {
-for (i=0; i<100; i++) {
+for (i=0; i<400; i++) {
   let pixel = document.createElement('div');
   pixel.classList.add('pixel');
   pixel.id = `pixel${i}`;
@@ -134,7 +200,7 @@ for (i=0; i<100; i++) {
   }
 }
 
-//This function shows that the player's time is over. Calls functions to pass the walls to an array and verify that there is a valid path (eventually). Blanks out the screen and then tells player 2 that it is their turn.
+//Function 5 - This function shows that the player's time is over. Calls functions to pass the walls to an array and verify that there is a valid path (eventually). Blanks out the screen and then tells player 2 that it is their turn.
 function turnIsOver() {
   board.removeEventListener('click', makeWall);
   let tempArray = passWallsToArray(); //This array holds the returned array.
@@ -153,6 +219,7 @@ function turnIsOver() {
   }, 3000);
 }
 
+//Function 6 - This function hides the timeUpScreen and makes the board visible again. If then calls the function to show the player a timer - createTimer(), and passes it 30 seconds. It also has a window.setTimeout that calls the function gameIsOver() after 30 seconds. Finally, it adds an eventListener that calls the function - makeEnemyLine() when the board is clicked.
 function playerTwoTurn() {
   timeUpScreen.classList.toggle('hide');
   board.classList.toggle('hide');
@@ -161,21 +228,23 @@ function playerTwoTurn() {
   board.addEventListener('click', makeEnemyLine);
 }
 
+
+//Function 7 - This function allows the enemy (player 2) to draw their line to the player's pixel. It first creates an array of the pixels that are directly around the original enemy pixel. If the enemy has clicked on any of the pixels that are in the array, that pixel is then part of the enemy's "line" and the pixels around that new enemy pixel are added to the array. If enemy's pixel reaches the player pixel before the time is up, global variable "winner" is set to "2" and gameisOver() is called
 function makeEnemyLine() {
   let square = document.getElementById(event.target.id);
   //The following IF statement makes sure the player isn't selecting the actual player or enemy pixel.
   let enemyBuffer = [];
-  for (i=0; i<100; i++) {
+  for (i=0; i<400; i++) {
     if ($(`#pixel${i}`).hasClass('enemy')) {
       enemyBuffer.push(`pixel${(i)}`);
       enemyBuffer.push(`pixel${(i-1)}`);
       enemyBuffer.push(`pixel${(i+1)}`);
-      enemyBuffer.push(`pixel${(i-11)}`);
-      enemyBuffer.push(`pixel${(i-10)}`);
-      enemyBuffer.push(`pixel${(i-9)}`);
-      enemyBuffer.push(`pixel${(i+9)}`);
-      enemyBuffer.push(`pixel${(i+10)}`);
-      enemyBuffer.push(`pixel${(i+11)}`);
+      enemyBuffer.push(`pixel${(i-21)}`);
+      enemyBuffer.push(`pixel${(i-20)}`);
+      enemyBuffer.push(`pixel${(i-19)}`);
+      enemyBuffer.push(`pixel${(i+19)}`);
+      enemyBuffer.push(`pixel${(i+20)}`);
+      enemyBuffer.push(`pixel${(i+21)}`);
     }
   }
   console.log(enemyBuffer);
@@ -191,6 +260,7 @@ function makeEnemyLine() {
 }
 
 
+//Function 8 - This function removes the eventListener for the clicks on the board that allows enemy lines to be made, and the eventListener on the timeUpScreen that starts player 2's turn. It also hides the board and removes the timer. Then, if the global variable "winner" is "1", the player 1 wins screen is displayed. If global variable "winner" is "2", the player 2 wins screen is displayed.
 function gameIsOver() {
   board.removeEventListener('click', makeEnemyLine);
   timeUpScreen.removeEventListener('click', playerTwoTurn);
@@ -207,15 +277,15 @@ function gameIsOver() {
   }
 }
 
-//This function will put all the pixels into an 2d array, each marked as either having a wall (1) or no wall (0). It returns that 2d array (wallsArray). It will also return the grid location of enemy (enemyPoint) and player (playerPoint).
+//Function 9 - This function will put all the pixels into an 2d array, each marked as either having a wall (1) or no wall (0). It returns that 2d array (wallsArray). It will also return the grid location of enemy (enemyPoint) and player (playerPoint).
 function passWallsToArray() {
   let wallsArray = [];
   let enemyPoint = [];
   let playerPoint = [];
-  for (i=0; i<10; i++) {
+  for (i=0; i<20; i++) {
     let rowArray = [];
-    for (j=0; j<10; j++) {
-      let pixelNum = (i*10)+(j);
+    for (j=0; j<20; j++) {
+      let pixelNum = (i*20)+(j);
       if ($(`#pixel${pixelNum}`).hasClass('wall')) {
         rowArray.push(1);
       } else if ($(`#pixel${pixelNum}`).hasClass('player')) {
@@ -237,7 +307,7 @@ function passWallsToArray() {
   return([wallsArray, enemyPoint, playerPoint]);
 }
 
-//This is where the system will verify that there is a valid path from the enemy to the player.
+//Function 10 - This is where the system will verify that there is a valid path from the enemy to the player.
 function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
   console.log(wallsArray);
   console.log("Enemy point " + enemyPoint[0], ' ', + enemyPoint[1]);
@@ -246,7 +316,7 @@ function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
 }
 
 
-//This function puts a timer on the page below the board so player can see how much time they of the enemy have left in their turn. It takes in an argument of how much time is left, which will either be 60000 for player or 30000 for enemy.
+//Function 11 - This function puts a timer on the page below the board so player can see how much time they of the enemy have left in their turn. It takes in an argument of how much time is left, which will either be 60000 for player or 30000 for enemy.
 function createTimer(timeLeft) {
   let visibleTimer = document.createElement('h1');
   game.append(visibleTimer);
@@ -270,10 +340,10 @@ function createTimer(timeLeft) {
   }, 10);
 }
 
-//This function determines where the enemy will be on the board, makes a buffer zone so the player isn't put right besides the enemy, and then determines where the player is places. If then returns an array with two elements, the player's location and the enemy's location.
+//Function 12 - This function determines where the enemy will be on the board, makes a buffer zone so the player isn't put right besides the enemy, and then determines where the player is places. If then returns an array with two elements, the player's location and the enemy's location.
 function piecePlacement() {
-  let enemyPixel = Math.floor(Math.random()*100);
-  let enemyBuffer = [(enemyPixel-1),(enemyPixel+1),(enemyPixel-11),(enemyPixel-10),(enemyPixel-9),(enemyPixel+9),(enemyPixel+10),(enemyPixel+11)];
+  let enemyPixel = Math.floor(Math.random()*400);
+  let enemyBuffer = [(enemyPixel-1),(enemyPixel+1),(enemyPixel-21),(enemyPixel-20),(enemyPixel-19),(enemyPixel+19),(enemyPixel+20),(enemyPixel+21)];
   let playerPixel = Math.floor(Math.random()*100);
   while (enemyBuffer.includes(playerPixel)) {
     playerPixel = Math.floor(Math.random()*100);
@@ -281,12 +351,12 @@ function piecePlacement() {
   return([playerPixel,enemyPixel]);
 }
 
-//This function adds the event listener for clicking squares to create walls.
+//Function 13 - This function adds the event listener for clicking squares to create walls.
 function drawNow() {
   board.addEventListener('click', makeWall);
 }
 
-//This is the function called by the event listener in drawNow().
+//Function 14 - This is the function called by the event listener in drawNow().
 function makeWall() {
   let square = document.getElementById(event.target.id);
   //The following IF statement makes sure the player isn't selecting the actual player or enemy pixel.
@@ -302,7 +372,7 @@ startScreen();
 
 
 
-//The following are functions dealing with Materialize and links on the page outside the actual game.
+// Epilogue - The following are functions dealing with Materialize and links on the page outside the actual game.
 
 //Getting the 'High Scores' and 'How to play' links.
 let highScores = $('#highScores');
