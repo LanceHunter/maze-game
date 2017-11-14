@@ -1,26 +1,52 @@
+/*
+
+Table of Contents -
+
+===========
+
+Prologue - global variables:
+
+  The three global variables are:
+    - "game", which is the jQuery search for the main game div on the page.
+    - "difficulty", which is the numerical value of the game difficulty.
+    - "winner", which tells if player 1 or player 2 wins
+
+===========
+
+Function 1 - startScreen()
+  Created the start screen for the game. Created a div for the start page, and puts the game title, a start button, and an options button on that div. If then created a click listener for the start and option button. The click listener for the start button calls 'startGame' and the click listener for the options button will call that function once it is written.
+
+===========
+
+Function 2 - startGame()
+  This function starts the game, calling the function that places the player and enemy pixels - piecePlacement(), calling the function that starts the timer - createTimer() (and passing it 60 seconds), calling the function that puts a timer display on the screen turnIsOver() (also passing it 60 seconds), marks the player and the enemy pixels on the board, and calls the function that allows player to draw walls.
+
+===========
+
+Function 3 - createBoard()
+
+  This function create the maze board's div and calls the function that will add the pixels to the board - newBoard().
+
+  ===========
+
+Function 4 - newBoard()
+
+  This function adds the pixels of the blank maze to the maze board. It gives each pixel the id 'pixel(i)' where i is from 0 to the last number.
+
+*/
+
 (function() {
+
+//Prologue - global variables
 
 //Getting the game div from the page.
 let game = $('#game');
-
 let difficulty = 0;
 let winner = 1;
 
 
-//This function starts the game, creating the board, placing the player and enemy pixels, starting the timer, and calling the function that allows player to draw walls.
-function startGame() {
-  let startingPlaces = piecePlacement();
-  createBoard();
-  createTimer(10000); //Note this is set to 10 seconds for now.
-  window.setTimeout(turnIsOver, 10000); //Note this is set to 10 seconds for now.
-  let playerStart = $(`#pixel${startingPlaces[0]}`);
-  let enemyStart = $(`#pixel${startingPlaces[1]}`);
-  playerStart.addClass('player');
-  enemyStart.addClass('enemy');
-  drawNow();
-}
 
-//This function creates the start screen with the "start" and "options" buttons.
+// Function 1 - This function creates the start screen with the game title, the "start" button, and "options" button.
 function startScreen() {
   //Creating the blank white Start Page background.
   let startPage = document.createElement('div');
@@ -73,7 +99,23 @@ function startScreen() {
   });
 }
 
-//Let's create the maze board's div.
+
+
+//Function 2 - This function starts the game, creating the board, placing the player and enemy pixels, starting the timer, and calling the function that allows player to draw walls.
+function startGame() {
+  let startingPlaces = piecePlacement();
+  createBoard();
+  createTimer(10000); //Note this is set to 10 seconds for now.
+  window.setTimeout(turnIsOver, 10000); //Note this is set to 10 seconds for now.
+  let playerStart = $(`#pixel${startingPlaces[0]}`);
+  let enemyStart = $(`#pixel${startingPlaces[1]}`);
+  playerStart.addClass('player');
+  enemyStart.addClass('enemy');
+  drawNow();
+}
+
+
+//Function 3 - This function create the maze board's div and calls the function that will add the pixels to the board.
 function createBoard() {
   let board = document.createElement('div');
   board.classList.add('board');
@@ -82,7 +124,7 @@ function createBoard() {
   newBoard();
 }
 
-//This function adds the pixels of the blank maze to the maze board.
+//Function 4 - This function adds the pixels of the blank maze to the maze board.
 function newBoard() {
 for (i=0; i<100; i++) {
   let pixel = document.createElement('div');
@@ -254,7 +296,7 @@ function makeWall() {
 }
 
 
-
+//Calling startScreen now to run game while testing
 startScreen();
 
 
