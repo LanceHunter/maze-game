@@ -10,6 +10,8 @@ Prologue - global variables:
     - "game", which is the jQuery search for the main game div on the page.
     - "difficulty", which is the numerical value of the game difficulty.
     - "winner", which tells if player 1 or player 2 wins
+    - "twoPlayerMode", a boolean determening if the game is in 2-player mode or not.
+    - "pathBackTotal", a global array with results of the pathfinding.
 
 ===========
 
@@ -109,6 +111,8 @@ Epilogue - Functions and variables that deal with clicks outside of the game. Mo
 let game = $('#game');
 let difficulty = 0;
 let winner = 1;
+let twoPlayerMode = false;
+let pathBackTotal;
 
 
 
@@ -204,7 +208,7 @@ for (i=0; i<400; i++) {
 function turnIsOver() {
   board.removeEventListener('click', makeWall);
   let tempArray = passWallsToArray(); //This array holds the returned array.
-  verifyValidPath(tempArray[0], tempArray[1], tempArray[2]);
+  pathBackTotal = verifyValidPath(tempArray[0], tempArray[1], tempArray[2]);
   //Hides the board so it can't be seen by player 2.
   board.classList.toggle('hide');
   //Shows player a "Time Up" screen
@@ -215,17 +219,35 @@ function turnIsOver() {
   game.prepend(timeUpScreen);
   window.setTimeout(function() {
     timeUpScreen.innerText = 'Player 2 click to begin';
-    timeUpScreen.addEventListener('click', playerTwoTurn);
+    if (pathBackTotal) {
+      timeUpScreen.addEventListener('click', playerTwoTurn);
+    } else {
+      winner = 2;
+      timeUpScreen.innerText = 'You Walled Yourself off! Player 2 Wins!';
+      timeUpScreen.addEventListener('click', gameIsOver); //Need to update function!!!
+    }
   }, 3000);
 }
 
-//Function 6 - This function hides the timeUpScreen and makes the board visible again. If then calls the function to show the player a timer - createTimer(), and passes it 30 seconds. It also has a window.setTimeout that calls the function gameIsOver() after 30 seconds. Finally, it adds an eventListener that calls the function - makeEnemyLine() when the board is clicked.
+//Function 6 - This function hides the timeUpScreen and makes the board visible again. If then calls the function to show the player a timer - createTimer(), and passes it 30 seconds. It also has a window.setTimeout that calls the function gameIsOver() after 30 seconds. Finally, if we are in twoPlayerMode it adds an eventListener that calls the function - makeEnemyLine() when the board is clicked. (If we are not in twoPlayerMode, it will draw the enemy line at an interval determined in the options.)
 function playerTwoTurn() {
   timeUpScreen.classList.toggle('hide');
   board.classList.toggle('hide');
   createTimer(10000); //Note this is temporarily set to 10 seconds.
   window.setTimeout(gameIsOver, 10000); //Note this is temporarily set to 10 seconds
-  board.addEventListener('click', makeEnemyLine);
+  if (twoPlayerMode) {
+    board.addEventListener('click', makeEnemyLine);
+  } else {
+    let aiAttack = window.setInterval(function() {
+      let changingPixel = pathBackTotal.shift();
+      $(changingPixel).addClass('enemy');
+      if ($(changingPixel).hasClass('player')) {
+        winner = 2;
+        clearInterval(aiAttack);
+        gameIsOver();
+      }
+    }, 100);
+  }
 }
 
 
@@ -248,6 +270,8 @@ function makeEnemyLine() {
     }
   }
   console.log(enemyBuffer);
+
+
   if ((!($(`#${event.target.id}`).hasClass('wall'))) && (enemyBuffer.includes(event.target.id))) {
     square.classList.add('enemy');
 
@@ -263,6 +287,7 @@ function makeEnemyLine() {
 //Function 8 - This function removes the eventListener for the clicks on the board that allows enemy lines to be made, and the eventListener on the timeUpScreen that starts player 2's turn. It also hides the board and removes the timer. Then, if the global variable "winner" is "1", the player 1 wins screen is displayed. If global variable "winner" is "2", the player 2 wins screen is displayed.
 function gameIsOver() {
   board.removeEventListener('click', makeEnemyLine);
+  timeUpScreen.removeEventListener('click', gameIsOver);
   timeUpScreen.removeEventListener('click', playerTwoTurn);
   board.classList.toggle('hide');
   $('#timer').remove();
@@ -287,32 +312,163 @@ function passWallsToArray() {
     for (j=0; j<20; j++) {
       let pixelNum = (i*20)+(j);
       if ($(`#pixel${pixelNum}`).hasClass('wall')) {
-        rowArray.push(1);
+        rowArray.push({'name': `#pixel${pixelNum}`, 'safe':false, 'distance':null, 'predecessor':null, 'coordinates': [i,j], 'visited':false});
       } else if ($(`#pixel${pixelNum}`).hasClass('player')) {
-        rowArray.push(2);
+        rowArray.push({'name': `#pixel${pixelNum}`, 'safe':true, 'distance':null, 'predecessor':null, 'coordinates': [i,j], 'visited':false});
         playerPoint.push(i);
         playerPoint.push(j);
       } else if ($(`#pixel${pixelNum}`).hasClass('enemy')) {
         enemyPoint.push(i);
         enemyPoint.push(j);
-        rowArray.push(2);
+        rowArray.push({'name': `#pixel${pixelNum}`, 'safe':true, 'distance':0, 'predecessor':null,'coordinates': [i,j], 'visited':false});
       } else {
-        rowArray.push(0);
+        rowArray.push({'name': `#pixel${pixelNum}`, 'safe':true, 'distance':null, 'predecessor':null, 'coordinates': [i,j], 'visited':false});
       }
     }
     wallsArray.push(rowArray);
   }
-//  console.log(wallsArray);
-//  console.log("start " + enemyPoint + " and end " + playerPoint);
   return([wallsArray, enemyPoint, playerPoint]);
 }
 
-//Function 10 - This is where the system will verify that there is a valid path from the enemy to the player.
+//Function 10 - This is where the system will verify that there is a valid path from the enemy to the player. It uses the BFS pathfinding algorithm and returns either "false" (if there is no path) or an array of the path from the enemy to the player.
 function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
   console.log(wallsArray);
   console.log("Enemy point " + enemyPoint[0], ' ', + enemyPoint[1]);
   console.log("Player point " + playerPoint[0], ' ', + playerPoint[1]);
-  //I'll do more on this later.
+
+  //BFS Pathfinding Algorithm ahoy!
+
+  let playerPointObject = wallsArray[(playerPoint[0])][(playerPoint[1])];
+  console.log(playerPointObject);
+  let queue = [];
+  queue.push(wallsArray[(enemyPoint[0])][(enemyPoint[1])]);
+  while ((queue.length !== 0) && !playerPointObject.visited) {
+    let currentSquare = queue.shift();
+//    console.log(currentSquare);
+    //This is where it gets weird...
+
+    //First we verify that there is an upper-Left square.
+    if (((currentSquare.coordinates[0]-1)>=0) && ((currentSquare.coordinates[1]-1)>=0)) {
+      let upLeftSquare = wallsArray[(currentSquare.coordinates[0]-1)][(currentSquare.coordinates[1]-1)];
+      //Checking the upper-left square from the current square to see if it can be traversed and if it has been visited before..
+      if (upLeftSquare.safe && !upLeftSquare.visited)  {
+        upLeftSquare.visited = true;
+        upLeftSquare.predecessor = currentSquare.name;
+        upLeftSquare.predecessorCoordinates = currentSquare.coordinates;
+        upLeftSquare.distance = currentSquare.distance + 1;
+        queue.push(upLeftSquare);
+      }
+    }
+
+    //Then we verify that there is an upper-center square.
+    if ((currentSquare.coordinates[0]-1)>=0) {
+      let upCenterSquare = wallsArray[(currentSquare.coordinates[0]-1)][(currentSquare.coordinates[1])];
+      //Checking the upper-center square from the current square to see if it can be traversed and if it has been visited before.
+      if (upCenterSquare.safe && !upCenterSquare.visited)  {
+        upCenterSquare.visited = true;
+        upCenterSquare.predecessor = currentSquare.name;
+        upCenterSquare.predecessorCoordinates = currentSquare.coordinates;
+        upCenterSquare.distance = currentSquare.distance + 1;
+        queue.push(upCenterSquare);
+      }
+    }
+
+    //Then we verify that there is an upper-right square.
+    if (((currentSquare.coordinates[0]-1)>=0) && ((currentSquare.coordinates[1]+1)<=19)) {
+      let upRightSquare = wallsArray[(currentSquare.coordinates[0]-1)][(currentSquare.coordinates[1]+1)];
+      //Checking the upper-right square from the current square.
+      if (upRightSquare.safe && !upRightSquare.visited)  {
+        upRightSquare.visited = true;
+        upRightSquare.predecessor = currentSquare.name;
+        upRightSquare.predecessorCoordinates = currentSquare.coordinates;
+        upRightSquare.distance = currentSquare.distance + 1;
+        queue.push(upRightSquare);
+      }
+    }
+
+    //Then we verify that there is an center-left square.
+    if ((currentSquare.coordinates[1]-1)>=0) {
+      let centerLeftSquare = wallsArray[currentSquare.coordinates[0]][(currentSquare.coordinates[1]-1)];
+      //Checking the center-left square from the current square.
+      if (centerLeftSquare.safe && !centerLeftSquare.visited)  {
+        centerLeftSquare.visited = true;
+        centerLeftSquare.predecessor = currentSquare.name;
+        centerLeftSquare.predecessorCoordinates = currentSquare.coordinates;
+        centerLeftSquare.distance = currentSquare.distance + 1;
+        queue.push(centerLeftSquare);
+      }
+    }
+
+    //Then we verify that there is an center-right square.
+    if ((currentSquare.coordinates[1]+1)<=19) {
+      let centerRightSquare = wallsArray[currentSquare.coordinates[0]][(currentSquare.coordinates[1]+1)];
+      //Checking the center-right square from the current square.
+      if (centerRightSquare.safe && !centerRightSquare.visited)  {
+        centerRightSquare.visited = true;
+        centerRightSquare.predecessor = currentSquare.name;
+        centerRightSquare.predecessorCoordinates = currentSquare.coordinates;
+        centerRightSquare.distance = currentSquare.distance + 1;
+        queue.push(centerRightSquare);
+      }
+    }
+
+    //Then we verify that there is an bottom-left square.
+    if (((currentSquare.coordinates[0]+1)<=19) && ((currentSquare.coordinates[1]-1)>=0)) {
+      let bottomLeftSquare = wallsArray[(currentSquare.coordinates[0]+1)][(currentSquare.coordinates[1]-1)];
+      //Checking the bottom-left square from the current square.
+      if (bottomLeftSquare.safe && !bottomLeftSquare.visited)  {
+        bottomLeftSquare.visited = true;
+        bottomLeftSquare.predecessor = currentSquare.name;
+        bottomLeftSquare.predecessorCoordinates = currentSquare.coordinates;
+        bottomLeftSquare.distance = currentSquare.distance + 1;
+        queue.push(bottomLeftSquare);
+      }
+    }
+
+    //Then we verify that there is an bottom-center square.
+    if ((currentSquare.coordinates[0]+1)<=19) {
+      let bottomCenterSquare = wallsArray[(currentSquare.coordinates[0]+1)][(currentSquare.coordinates[1])];
+      //Checking the bottom-center square from the current square.
+      if (bottomCenterSquare.safe && !bottomCenterSquare.visited)  {
+        bottomCenterSquare.visited = true;
+        bottomCenterSquare.predecessor = currentSquare.name;
+        bottomCenterSquare.predecessorCoordinates = currentSquare.coordinates;
+        bottomCenterSquare.distance = currentSquare.distance + 1;
+        queue.push(bottomCenterSquare);
+      }
+    }
+
+    //Finally, we verify that there is an bottom-right square.
+    if (((currentSquare.coordinates[0]+1)<=19) && ((currentSquare.coordinates[1]+1)<=19)) {
+      let bottomRightSquare = wallsArray[(currentSquare.coordinates[0]+1)][(currentSquare.coordinates[1]+1)];
+      //Checking the bottom-right square from the current square.
+      if (bottomRightSquare.safe && !bottomRightSquare.visited)  {
+        bottomRightSquare.visited = true;
+        bottomRightSquare.predecessor = currentSquare.name;
+        bottomRightSquare.predecessorCoordinates = currentSquare.coordinates;
+        bottomRightSquare.distance = currentSquare.distance + 1;
+        queue.push(bottomRightSquare);
+      }
+    }
+  }
+
+  //We have now found if there is a path. We will now check to see if there path is there by seeing if the playerPointObject was visited...
+
+  if (!playerPointObject.visited) {
+    return false;
+  } else {
+    let pathBack = [];
+    pathBack.unshift(playerPointObject.name);
+    let pathBackSpot = playerPointObject.predecessorCoordinates;
+    for (i = 0; i< playerPointObject.distance; i++) {
+      pathBack.unshift(wallsArray[pathBackSpot[0]][pathBackSpot[1]].name);
+      console.log(wallsArray[pathBackSpot[0]][pathBackSpot[1]].predecessorCoordinates);
+      console.log(pathBack);
+      pathBackSpot = wallsArray[pathBackSpot[0]][pathBackSpot[1]].predecessorCoordinates;
+    }
+    return(pathBack);
+  }
+
 }
 
 
