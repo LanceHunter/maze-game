@@ -45,7 +45,7 @@ Function 5 - turnIsOver()
 
 Function 6 - playerTwoTurn()
 
-  This function hides the timeUpScreen and makes the board visible again. If then calls the function to show the player a timer - createTimer(), and passes it 30 seconds. It also has a window.setTimeout that calls the function gameIsOver() after 30 seconds. Finally, it adds an eventListener that calls the function - makeEnemyLine() when the board is clicked.
+  This function hides the timeUpScreen and makes the board visible again. If then calls the function to show the player a timer - createTimer(), and passes it 30 seconds. It also has a window.setTimeout that calls the function gameIsOver() after 30 seconds. Finally, it checks to see if we are in twoPlayerMode or not. If we are, it adds an eventListener that calls the function - makeEnemyLine() when the board is clicked. Otherwise, it has the enemyAI attack you at a pace determined by the difficulty.
 
 ===========
 
@@ -70,7 +70,7 @@ Function 9 - passWallsToArray()
 
 Function 10 - verifyValidPath()
 
-  This is where the system will verify that there is a valid path from the enemy to the player. It takes 3 arguments, the 2d array of the grid, the array of the enemy's location, and the array of the player's location. (Pathfinding algorithm to-be-written later today.)
+  This is where the system will verify that there is a valid path from the enemy to the player. It takes 3 arguments, the 2d array of the grid, the array of the enemy's location, and the array of the player's location. It will either return "false" (if there is no valid path) or a map of the coordinates between the points.
 
 ===========
 
@@ -175,8 +175,8 @@ function startScreen() {
 function startGame() {
   let startingPlaces = piecePlacement();
   createBoard();
-  createTimer(10000); //Note this is set to 10 seconds for now.
-  window.setTimeout(turnIsOver, 10000); //Note this is set to 10 seconds for now.
+  createTimer(60000); //Note this is set to 10 seconds for now.
+  window.setTimeout(turnIsOver, 60000); //Note this is set to 10 seconds for now.
   let playerStart = $(`#pixel${startingPlaces[0]}`);
   let enemyStart = $(`#pixel${startingPlaces[1]}`);
   playerStart.addClass('player');
@@ -237,6 +237,7 @@ function playerTwoTurn() {
   window.setTimeout(gameIsOver, 10000); //Note this is temporarily set to 10 seconds
   if (twoPlayerMode) {
     board.addEventListener('click', makeEnemyLine);
+
   } else {
     let aiAttack = window.setInterval(function() {
       let changingPixel = pathBackTotal.shift();
@@ -510,6 +511,7 @@ function piecePlacement() {
 //Function 13 - This function adds the event listener for clicking squares to create walls.
 function drawNow() {
   board.addEventListener('click', makeWall);
+  board.addEventListener('mousedown', drawToDraw);
 }
 
 //Function 14 - This is the function called by the event listener in drawNow().
@@ -520,6 +522,24 @@ function makeWall() {
     square.classList.toggle('wall');
   }
 }
+
+//Function 15 - Allowing drag-to-draw for creating walls.
+function drawToDraw() {
+  board.addEventListener('mouseover', makeWall);
+  board.addEventListener('mouseup', function() {
+    board.removeEventListener('mouseover', makeWall);;
+  });
+}
+
+//Function 16 - Allowing drag-to-draw for creating enemy line.
+function drawToDraw() {
+  board.addEventListener('mouseover', makeEnemyLine);
+  board.addEventListener('mouseup', function() {
+    board.removeEventListener('mouseover', makeEnemyLine);;
+  });
+}
+
+
 
 
 //Calling startScreen now to run game while testing
