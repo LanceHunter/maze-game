@@ -186,7 +186,12 @@ function startScreen() {
   $optionButton.click(function() {
     startPage.classList.toggle('hide');
     console.log('Option Button Pressed!');
-    optionsPage();
+    if ($(`optionPage`).length) {
+      startPage.classList.toggle('hide');
+      optionPage.classList.toggle('hide');
+    } else {
+      optionsPage();
+    }
   });
 }
 
