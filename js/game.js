@@ -111,7 +111,7 @@ Epilogue - Functions and variables that deal with clicks outside of the game. Mo
 let game = $('#game');
 let difficulty = 0;
 let winner = 1;
-let twoPlayerMode = false;
+let twoPlayerMode = true;
 let pathBackTotal;
 
 
@@ -175,8 +175,8 @@ function startScreen() {
 function startGame() {
   let startingPlaces = piecePlacement();
   createBoard();
-  createTimer(60000); //Note this is set to 10 seconds for now.
-  window.setTimeout(turnIsOver, 60000); //Note this is set to 10 seconds for now.
+  createTimer(10000); //Note this is set to 10 seconds for now.
+  window.setTimeout(turnIsOver, 10000); //Note this is set to 10 seconds for now.
   let playerStart = $(`#pixel${startingPlaces[0]}`);
   let enemyStart = $(`#pixel${startingPlaces[1]}`);
   playerStart.addClass('player');
@@ -207,6 +207,7 @@ for (i=0; i<400; i++) {
 //Function 5 - This function shows that the player's time is over. Calls functions to pass the walls to an array and verify that there is a valid path (eventually). Blanks out the screen and then tells player 2 that it is their turn.
 function turnIsOver() {
   board.removeEventListener('click', makeWall);
+  board.removeEventListener('mousedown', dragToDraw);
   let tempArray = passWallsToArray(); //This array holds the returned array.
   pathBackTotal = verifyValidPath(tempArray[0], tempArray[1], tempArray[2]);
   //Hides the board so it can't be seen by player 2.
@@ -237,7 +238,7 @@ function playerTwoTurn() {
   window.setTimeout(gameIsOver, 10000); //Note this is temporarily set to 10 seconds
   if (twoPlayerMode) {
     board.addEventListener('click', makeEnemyLine);
-
+    board.addEventListener('mousedown', dragToDrawEnemy);
   } else {
     let aiAttack = window.setInterval(function() {
       let changingPixel = pathBackTotal.shift();
@@ -275,8 +276,8 @@ function makeEnemyLine() {
 
   if ((!($(`#${event.target.id}`).hasClass('wall'))) && (enemyBuffer.includes(event.target.id))) {
     square.classList.add('enemy');
-
   }
+
   if (($(`#${event.target.id}`).hasClass('player')) && (enemyBuffer.includes(event.target.id))) {
     console.log('Player 2 Wins!');
     winner = 2;
@@ -288,8 +289,10 @@ function makeEnemyLine() {
 //Function 8 - This function removes the eventListener for the clicks on the board that allows enemy lines to be made, and the eventListener on the timeUpScreen that starts player 2's turn. It also hides the board and removes the timer. Then, if the global variable "winner" is "1", the player 1 wins screen is displayed. If global variable "winner" is "2", the player 2 wins screen is displayed.
 function gameIsOver() {
   board.removeEventListener('click', makeEnemyLine);
+  board.removeEventListener('mouseover', makeEnemyLine);
   timeUpScreen.removeEventListener('click', gameIsOver);
   timeUpScreen.removeEventListener('click', playerTwoTurn);
+
   board.classList.toggle('hide');
   $('#timer').remove();
   if (winner === 1) {
@@ -511,7 +514,7 @@ function piecePlacement() {
 //Function 13 - This function adds the event listener for clicking squares to create walls.
 function drawNow() {
   board.addEventListener('click', makeWall);
-  board.addEventListener('mousedown', drawToDraw);
+  board.addEventListener('mousedown', dragToDraw);
 }
 
 //Function 14 - This is the function called by the event listener in drawNow().
@@ -524,18 +527,18 @@ function makeWall() {
 }
 
 //Function 15 - Allowing drag-to-draw for creating walls.
-function drawToDraw() {
+function dragToDraw() {
   board.addEventListener('mouseover', makeWall);
   board.addEventListener('mouseup', function() {
-    board.removeEventListener('mouseover', makeWall);;
+    board.removeEventListener('mouseover', makeWall);
   });
 }
 
 //Function 16 - Allowing drag-to-draw for creating enemy line.
-function drawToDraw() {
+function dragToDrawEnemy() {
   board.addEventListener('mouseover', makeEnemyLine);
   board.addEventListener('mouseup', function() {
-    board.removeEventListener('mouseover', makeEnemyLine);;
+    board.removeEventListener('mouseover', makeEnemyLine);
   });
 }
 
