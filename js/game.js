@@ -98,6 +98,25 @@ Function 14 - makeWall()
 
 ===========
 
+
+Function 15 -dragToDraw()
+
+  Allowing drag-to-draw for creating walls. This creates eventlisteners for mouseover that calls makeWall() for each instance while the mouse is down.
+
+===========
+
+Function 16 dragToDrawEnemy()
+
+  Allowing drag-to-draw for creating enemy line. This creates eventlisteners for mouseover that calls makeEnemyLine() for each instance while the mouse is down.
+
+===========
+
+Function 17 optionsPage()
+
+  This is the options screen, where player can select if they want 1-player or 2-player mode, and select the difficulty of 1-player mode.
+
+===========
+
 Epilogue - Functions and variables that deal with clicks outside of the game. Mostly Materialize toasts.
 
 ===========
@@ -165,7 +184,9 @@ function startScreen() {
   //Creating a click listener for the options button that brings up the options screen.
   let $optionButton = $('#optionButton');
   $optionButton.click(function() {
+    startPage.classList.toggle('hide');
     console.log('Option Button Pressed!');
+    optionsPage();
   });
 }
 
@@ -206,8 +227,12 @@ for (i=0; i<400; i++) {
 
 //Function 5 - This function shows that the player's time is over. Calls functions to pass the walls to an array and verify that there is a valid path (eventually). Blanks out the screen and then tells player 2 that it is their turn.
 function turnIsOver() {
+  //Removing all the eventlisteners that happened on player one's turn.
   board.removeEventListener('click', makeWall);
   board.removeEventListener('mousedown', dragToDraw);
+  board.removeEventListener('mouseup', function() {
+    board.removeEventListener('mouseover', makeWall);
+  });
   let tempArray = passWallsToArray(); //This array holds the returned array.
   pathBackTotal = verifyValidPath(tempArray[0], tempArray[1], tempArray[2]);
   //Hides the board so it can't be seen by player 2.
@@ -253,7 +278,7 @@ function playerTwoTurn() {
 }
 
 
-//Function 7 - This function allows the enemy (player 2) to draw their line to the player's pixel. It first creates an array of the pixels that are directly around the original enemy pixel. If the enemy has clicked on any of the pixels that are in the array, that pixel is then part of the enemy's "line" and the pixels around that new enemy pixel are added to the array. If enemy's pixel reaches the player pixel before the time is up, global variable "winner" is set to "2" and gameisOver() is called
+//Function 7 - This function allows the enemy (player 2) to draw their line to the player's pixel. It first creates an array of the pixels that are directly around the original enemy pixel. If the enemy has clicked on any of the pixels that are in the array, that pixel is then part of the enemy's "line" and the pixels around that new enemy pixel are added to the array. If enemy's pixel reaches the player pixel before the time is up, global variable "winner" is set to "2" and gameisOver() is called.
 function makeEnemyLine() {
   let square = document.getElementById(event.target.id);
   //The following IF statement makes sure the player isn't selecting the actual player or enemy pixel.
@@ -290,6 +315,9 @@ function makeEnemyLine() {
 function gameIsOver() {
   board.removeEventListener('click', makeEnemyLine);
   board.removeEventListener('mouseover', makeEnemyLine);
+  board.removeEventListener('mouseup', function() {
+    board.removeEventListener('mouseover', makeEnemyLine);
+  });
   timeUpScreen.removeEventListener('click', gameIsOver);
   timeUpScreen.removeEventListener('click', playerTwoTurn);
 
@@ -526,7 +554,7 @@ function makeWall() {
   }
 }
 
-//Function 15 - Allowing drag-to-draw for creating walls.
+//Function 15 - Allowing drag-to-draw for creating walls. This creates eventlisteners for mouseover that calls makeWall() for each instance while the mouse is down.
 function dragToDraw() {
   board.addEventListener('mouseover', makeWall);
   board.addEventListener('mouseup', function() {
@@ -534,7 +562,7 @@ function dragToDraw() {
   });
 }
 
-//Function 16 - Allowing drag-to-draw for creating enemy line.
+//Function 16 - Allowing drag-to-draw for creating enemy line. This creates eventlisteners for mouseover that calls makeEnemyLine() for each instance while the mouse is down.
 function dragToDrawEnemy() {
   board.addEventListener('mouseover', makeEnemyLine);
   board.addEventListener('mouseup', function() {
@@ -542,6 +570,43 @@ function dragToDrawEnemy() {
   });
 }
 
+//Function 17 - This is the options screen, where player can select if they want 1-player or 2-player mode, and select the difficulty of 1-player mode.
+function optionsPage() {
+  //Creating the blank white Option Page background.
+  let optionPage = document.createElement('div');
+  optionPage.classList.add('optionPage');
+  optionPage.classList.add('center');
+  optionPage.id = `optionPage`;
+  game.append(optionPage);
+
+  let returnButton = document.createElement('div');
+  returnButton.classList.add('optionButton');
+  returnButton.classList.add('center');
+  returnButton.id = `returnButton`;
+  returnButton.innerText = `Return`;
+
+
+  //Creating the logo (and a helpful breakline insert).
+  let optionsLogo = document.createElement('h1');
+  let breakLine = document.createElement('br');
+  optionsLogo.innerText = `Maze Game - Options`;
+
+  //Adding the title, start button, and option button to the start screen div.
+  optionPage.append(optionsLogo);
+//  startPage.append(startButton);
+  optionPage.append(breakLine);
+  optionPage.append(returnButton);
+
+  //Creating a click listener for the start button that begins the game.
+  let $returnButton = $('#returnButton');
+  $returnButton.click(function() {
+    optionPage.classList.toggle('hide');
+    startPage.classList.toggle('hide');
+    console.log('Return Button Pressed!');
+  });
+
+  //Creating a click listener for the options button that brings up the options screen.
+}
 
 
 
