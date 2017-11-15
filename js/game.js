@@ -12,6 +12,7 @@ Prologue - global variables:
     - "winner", which tells if player 1 or player 2 wins
     - "twoPlayerMode", a boolean determening if the game is in 2-player mode or not.
     - "pathBackTotal", a global array with results of the pathfinding.
+    - "gameEnded", a global boolean that keeps the game from ending twice
 
 ===========
 
@@ -132,6 +133,7 @@ let difficulty = 0;
 let winner = 1;
 let twoPlayerMode = false;
 let pathBackTotal;
+let gameEnded = false;
 
 
 
@@ -147,21 +149,24 @@ function startScreen() {
   //Creating the start button.
   let startButton = document.createElement('div');
   startButton.classList.add('startButton');
-  startButton.classList.add('center');
+  startButton.classList.add('center-align');
+  startButton.classList.add('valign-wrapper');
   startButton.id = `startButton`;
 //  startButton.innerText = `Start`;
 
   //Creating the options button.
   let optionButton = document.createElement('div');
   optionButton.classList.add('optionButton');
-  optionButton.classList.add('center');
+  optionButton.classList.add('center-align');
+  optionButton.classList.add('valign-wrapper');
   optionButton.id = `optionButton`;
 //  optionButton.innerHtml = `<i class="material-icons">play_arrow</i>`;
 
   //Creating the tutorial button.
   let tutorialButton = document.createElement('div');
   tutorialButton.classList.add('tutorialButton');
-  tutorialButton.classList.add('center');
+  tutorialButton.classList.add('valign-wrapper');
+//  tutorialButton.classList.add('center-align');
   tutorialButton.id = `tutorialButton`;
 //  tutorialButton.innerText = `Tutorial`;
 
@@ -179,7 +184,7 @@ function startScreen() {
 
   //Creating a click listener for the start button that begins the game.
   let $startButton = $('#startButton');
-  $startButton.append(`<span>Start</span>`);
+  $startButton.append(`<span class='insideButton'>Start</span>`);
   $startButton.click(function() {
     startPage.classList.toggle('hide');
     console.log('Start Button Pressed!');
@@ -188,7 +193,7 @@ function startScreen() {
 
   //Creating a click listener for the options button that brings up the options screen.
   let $optionButton = $('#optionButton');
-  $optionButton.append(`<span>Options</span>`);
+  $optionButton.append(`<span class='insideButton'>Options</span>`);
   $optionButton.click(function() {
     startPage.classList.toggle('hide');
     console.log('Option Button Pressed!');
@@ -202,9 +207,9 @@ function startScreen() {
 
   //Creating a click listener for the tutorial button that opens the tutorial video.
   let $tutorialButton = $('#tutorialButton');
-  $tutorialButton.append(`<span>Tutorial</span>`);
+  $tutorialButton.append(`<span class='insideButton'>Tutorial</span>`);
   $tutorialButton.click(function() {
-    startPage.classList.toggle('hide');
+//    startPage.classList.toggle('hide');
     console.log('Tutorial Button Pressed!');
   });
 
@@ -214,6 +219,9 @@ function startScreen() {
 
 //Function 2 - This function starts the game, creating the board, placing the player and enemy pixels, starting the timer, and calling the function that allows player to draw walls.
 function startGame() {
+  if ($('#timeUpScreen').length !== 0) {
+    $('#timeUpScreen').off();
+  }
   let startingPlaces = piecePlacement();
   createBoard();
   createTimer(10000); //Note this is set to 10 seconds for now.
@@ -266,11 +274,11 @@ function turnIsOver() {
   window.setTimeout(function() {
     timeUpScreen.innerText = 'Player 2 click to begin';
     if (pathBackTotal) {
-      timeUpScreen.addEventListener('click', playerTwoTurn);
+      $(`#timeUpScreen`).click(playerTwoTurn);
     } else {
       winner = 2;
       timeUpScreen.innerText = 'You Walled Yourself off! Player 2 Wins!';
-      timeUpScreen.addEventListener('click', gameIsOver); //Need to update function!!!
+      $(`#timeUpScreen`).click(gameIsOver); //Need to update function!!!
     }
   }, 3000);
 }
@@ -341,17 +349,22 @@ function gameIsOver() {
   timeUpScreen.removeEventListener('click', gameIsOver);
   timeUpScreen.removeEventListener('click', playerTwoTurn);
 
-  board.classList.toggle('hide');
+
+  board.classList.add('hide');
   $('#timer').remove();
   if (winner === 1) {
-    timeUpScreen.classList.toggle('hide');
+    timeUpScreen.classList.remove('hide');
     timeUpScreen.style.backgroundColor = "#4caf50";
-    timeUpScreen.innerText = "Player 1 Wins!"
+    timeUpScreen.innerText = "Player 1 Wins! Click to play again!"
   } else {
-    timeUpScreen.classList.toggle('hide');
+    timeUpScreen.classList.remove('hide');
     timeUpScreen.style.backgroundColor = "#e53935";
-    timeUpScreen.innerText = "Player 2 Wins!"
+    timeUpScreen.innerText = "Player 2 Wins! Click to play again!"
   }
+
+  $('#timeUpScreen').click(function() {
+    location.reload(true);
+  });
 }
 
 //Function 9 - This function will put all the pixels into an 2d array, each marked as either having a wall (1) or no wall (0). It returns that 2d array (wallsArray). It will also return the grid location of enemy (enemyPoint) and player (playerPoint).
@@ -561,8 +574,8 @@ function piecePlacement() {
 
 //Function 13 - This function adds the event listener for clicking squares to create walls.
 function drawNow() {
-  board.addEventListener('click', makeWall);
-  board.addEventListener('mousedown', dragToDraw);
+  $(`#board`).click(makeWall);
+  $(`#board`).mousedown(dragToDraw);
 }
 
 //Function 14 - This is the function called by the event listener in drawNow().
@@ -576,9 +589,10 @@ function makeWall() {
 
 //Function 15 - Allowing drag-to-draw for creating walls. This creates eventlisteners for mouseover that calls makeWall() for each instance while the mouse is down.
 function dragToDraw() {
-  board.addEventListener('mouseover', makeWall);
-  board.addEventListener('mouseup', function() {
-    board.removeEventListener('mouseover', makeWall);
+  $(`#board`).mouseover(makeWall);
+  $(`#board`).mouseup(function() {
+    $(`#board`).off();
+    drawNow();
   });
 }
 
@@ -602,8 +616,14 @@ function optionsPage() {
   let returnButton = document.createElement('div');
   returnButton.classList.add('optionButton');
   returnButton.classList.add('center');
+  returnButton.classList.add('valign-wrapper');
   returnButton.id = `returnButton`;
-  returnButton.innerText = `Return`;
+
+  let twoPlayerModeButton = document.createElement('div');
+  twoPlayerModeButton.classList.add('optionButton');
+  twoPlayerModeButton.classList.add('center');
+  twoPlayerModeButton.classList.add('valign-wrapper');
+  twoPlayerModeButton.id = `twoPlayerModeButton`;
 
 
   //Creating the logo (and a helpful breakline insert).
@@ -611,21 +631,39 @@ function optionsPage() {
   let breakLine = document.createElement('br');
   optionsLogo.innerText = `Maze Game - Options`;
 
-  //Adding the title, start button, and option button to the start screen div.
+  //Adding the twoPlayerMade, difficulty, and return button to the start screen div.
+  optionPage.append(twoPlayerModeButton);
   optionPage.append(optionsLogo);
-//  startPage.append(startButton);
-  optionPage.append(breakLine);
   optionPage.append(returnButton);
 
-  //Creating a click listener for the start button that begins the game.
+  //Creating a click listener for the return button that brings the start page back.
   let $returnButton = $('#returnButton');
+  $returnButton.append(`<span class='insideButton'>Return</span>`);
   $returnButton.click(function() {
     optionPage.classList.toggle('hide');
     startPage.classList.toggle('hide');
     console.log('Return Button Pressed!');
   });
 
-  //Creating a click listener for the options button that brings up the options screen.
+  //Creating a click listener for the twoPlayerMade button that toggles between 1 and 2 player mode the start page back.
+  let $twoPlayerModeButton = $('#twoPlayerModeButton');
+  $twoPlayerModeButton.append(`<span class='insideButton' id='onePlayerText'>One Player</span>`);
+  $twoPlayerModeButton.append(`<span class='insideButton hide' id='twoPlayerText'>Two Players</span>`);
+  $twoPlayerModeButton.click(function() {
+    if (twoPlayerMode) {
+      $('#onePlayerText').toggleClass('hide');
+      $('#twoPlayerText').toggleClass('hide');
+      console.log('Changed to 1 player mode!');
+      twoPlayerMode = false;
+    } else {
+      $('#onePlayerText').toggleClass('hide');
+      $('#twoPlayerText').toggleClass('hide');
+      console.log('Changed to 2 player mode!');
+      twoPlayerMode = true;
+    }
+  });
+
+
 }
 
 

@@ -21,6 +21,9 @@ main {
 .optionPage {
   height: 600px;
   background-color: white;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .pixel {
@@ -45,6 +48,7 @@ main {
   width: 50%;
   height: 50%;
   background-color: #e53935;
+  font-size: 6em;
 }
 
 .startButton {
@@ -53,6 +57,7 @@ main {
   height: 50%;
   margins:none;
   background-color: #4caf50;
+  font-size: 9em;
 }
 
 .tutorialButton {
@@ -60,6 +65,11 @@ main {
   width: 50%;
   height: 50%;
   background-color: #e53935;
+  font-size: 6em;
+}
+
+.insideButton {
+  margin: auto;
 }
 
 
