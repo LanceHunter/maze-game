@@ -130,7 +130,7 @@ Epilogue - Functions and variables that deal with clicks outside of the game. Mo
 let game = $('#game');
 let difficulty = 0;
 let winner = 1;
-let twoPlayerMode = true;
+let twoPlayerMode = false;
 let pathBackTotal;
 
 
@@ -201,8 +201,8 @@ function startScreen() {
 function startGame() {
   let startingPlaces = piecePlacement();
   createBoard();
-  createTimer(10000); //Note this is set to 10 seconds for now.
-  window.setTimeout(turnIsOver, 10000); //Note this is set to 10 seconds for now.
+  createTimer(60000); //Note this is set to 10 seconds for now.
+  window.setTimeout(turnIsOver, 60000); //Note this is set to 10 seconds for now.
   let playerStart = $(`#pixel${startingPlaces[0]}`);
   let enemyStart = $(`#pixel${startingPlaces[1]}`);
   playerStart.addClass('player');
@@ -264,8 +264,8 @@ function turnIsOver() {
 function playerTwoTurn() {
   timeUpScreen.classList.toggle('hide');
   board.classList.toggle('hide');
-  createTimer(10000); //Note this is temporarily set to 10 seconds.
-  window.setTimeout(gameIsOver, 10000); //Note this is temporarily set to 10 seconds
+  createTimer(30000); //Note this is temporarily set to 10 seconds.
+  window.setTimeout(gameIsOver, 30000); //Note this is temporarily set to 10 seconds
   if (twoPlayerMode) {
     board.addEventListener('click', makeEnemyLine);
     board.addEventListener('mousedown', dragToDrawEnemy);
@@ -278,7 +278,7 @@ function playerTwoTurn() {
         clearInterval(aiAttack);
         gameIsOver();
       }
-    }, 100);
+    }, 300);
   }
 }
 
