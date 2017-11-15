@@ -141,10 +141,6 @@ function startScreen() {
   let startPage = document.createElement('div');
   startPage.classList.add('startPage');
   startPage.classList.add('center');
-  startPage.classList.add('col');
-  startPage.classList.add('s12');
-  startPage.classList.add('m12');
-  startPage.classList.add('l12');
   startPage.id = `startPage`;
   game.append(startPage);
 
@@ -162,16 +158,25 @@ function startScreen() {
   optionButton.id = `optionButton`;
   optionButton.innerText = `Options`;
 
+  //Creating the tutorial button.
+  let tutorialButton = document.createElement('div');
+  tutorialButton.classList.add('tutorialButton');
+  tutorialButton.classList.add('center');
+  tutorialButton.id = `tutorialButton`;
+  tutorialButton.innerText = `Tutorial`;
+
+
   //Creating the logo (and a helpful breakline insert).
   let startLogo = document.createElement('h1');
   let breakLine = document.createElement('br');
+  tutorialButton.classList.add('center');
   startLogo.innerText = `Maze Game!`;
 
   //Adding the title, start button, and option button to the start screen div.
-  startPage.append(startLogo);
+//  startPage.append(startLogo);
   startPage.append(startButton);
-  startPage.append(breakLine);
   startPage.append(optionButton);
+  startPage.append(tutorialButton);
 
   //Creating a click listener for the start button that begins the game.
   let $startButton = $('#startButton');
@@ -186,11 +191,11 @@ function startScreen() {
   $optionButton.click(function() {
     startPage.classList.toggle('hide');
     console.log('Option Button Pressed!');
-    if ($(`optionPage`).length) {
-      startPage.classList.toggle('hide');
+    if ($(`#optionPage`).length !== 0) {
       optionPage.classList.toggle('hide');
     } else {
       optionsPage();
+      console.log('Creating Options Page!');
     }
   });
 }
@@ -201,8 +206,8 @@ function startScreen() {
 function startGame() {
   let startingPlaces = piecePlacement();
   createBoard();
-  createTimer(60000); //Note this is set to 10 seconds for now.
-  window.setTimeout(turnIsOver, 60000); //Note this is set to 10 seconds for now.
+  createTimer(10000); //Note this is set to 10 seconds for now.
+  window.setTimeout(turnIsOver, 10000); //Note this is set to 10 seconds for now.
   let playerStart = $(`#pixel${startingPlaces[0]}`);
   let enemyStart = $(`#pixel${startingPlaces[1]}`);
   playerStart.addClass('player');
@@ -264,8 +269,8 @@ function turnIsOver() {
 function playerTwoTurn() {
   timeUpScreen.classList.toggle('hide');
   board.classList.toggle('hide');
-  createTimer(30000); //Note this is temporarily set to 10 seconds.
-  window.setTimeout(gameIsOver, 30000); //Note this is temporarily set to 10 seconds
+  createTimer(10000); //Note this is temporarily set to 10 seconds.
+  window.setTimeout(gameIsOver, 10000); //Note this is temporarily set to 10 seconds
   if (twoPlayerMode) {
     board.addEventListener('click', makeEnemyLine);
     board.addEventListener('mousedown', dragToDrawEnemy);

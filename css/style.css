@@ -13,11 +13,14 @@ main {
 .startPage {
   height: 600px;
   background-color: white;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .optionPage {
   height: 600px;
-  background-color: white;  
+  background-color: white;
 }
 
 .pixel {
@@ -38,16 +41,26 @@ main {
 }
 
 .optionButton {
-  border-radius: 100px;
+  border-radius: 250px;
   padding: 100px;
+  width: 50%;
   background-color: #e53935;
 }
 
 .startButton {
-  border-radius: 100px;
+  border-radius: 250px;
   padding: 100px;
+  width: 100%;
   background-color: #4caf50;
 }
+
+.tutorialButton {
+  border-radius: 250px;
+  padding: 100px;
+  width: 50%;
+  background-color: #e53935;
+}
+
 
 .player {
   background-color: #4caf50;
