@@ -264,7 +264,11 @@ function turnIsOver() {
   let tempArray = passWallsToArray(); //This array holds the returned array.
   pathBackTotal = verifyValidPath(tempArray[0], tempArray[1], tempArray[2]);
   //Hides the board so it can't be seen by player 2.
-  board.classList.toggle('hide');
+//  board.classList.toggle('hide');
+  //This will remove the old board and then call the function to make the player 2 board.
+  $('#board').remove();
+  makePlayerTwoBoard(tempArray[0], tempArray[1], tempArray[2]);
+
   //Shows player a "Time Up" screen
   let timeUpScreen = document.createElement('div');
   timeUpScreen.classList.add('timeUpScreen');
@@ -278,7 +282,9 @@ function turnIsOver() {
     } else {
       winner = 2;
       timeUpScreen.innerText = 'You Walled Yourself off! Player 2 Wins!';
-      $(`#timeUpScreen`).click(gameIsOver); //Need to update function!!!
+      $(`#timeUpScreen`).click(function() {
+        location.reload(true);
+      }); //Need to update function!!!
     }
   }, 3000);
 }
@@ -286,7 +292,6 @@ function turnIsOver() {
 //Function 6 - This function hides the timeUpScreen and makes the board visible again. If then calls the function to show the player a timer - createTimer(), and passes it 30 seconds. It also has a window.setTimeout that calls the function gameIsOver() after 30 seconds. Finally, if we are in twoPlayerMode it adds an eventListener that calls the function - makeEnemyLine() when the board is clicked. (If we are not in twoPlayerMode, it will draw the enemy line at an interval determined in the options.)
 function playerTwoTurn() {
   $(`#timeUpScreen`).addClass('hide');
-  $(`#board`).removeClass('hide');
   $(`#timer`).removeClass('hide');
   createTimer(10000); //Note this is temporarily set to 10 seconds.
   window.setTimeout(gameIsOver, 10000); //Note this is temporarily set to 10 seconds
@@ -350,7 +355,6 @@ function gameIsOver() {
   if (winner === 1) {
     timeUpScreen.classList.remove('hide');
     timeUpScreen.style.backgroundColor = "#4caf50";
-    timeUpScreen.style.opacity = "0.5";
     timeUpScreen.innerText = "Player 1 Wins! Click to play again!"
   } else {
     timeUpScreen.classList.remove('hide');
@@ -389,6 +393,33 @@ function passWallsToArray() {
     wallsArray.push(rowArray);
   }
   return([wallsArray, enemyPoint, playerPoint]);
+}
+
+//Function 9.5 - This will create a second div to be added to the board with the same walls and locations as the original, so that any mouse holdover events from the previous board div aren't carried over.
+
+function makePlayerTwoBoard(wallsArray, enemyPoint, playerPoint) {
+  let board = document.createElement('div');
+  board.classList.add('board');
+  board.id = `board`;
+  game.append(board);
+  let tempString = '';
+  for (i=0; i<20; i++) {
+    for (j=0; j<20; j++) {
+      let pixel = document.createElement('div');
+      pixel.classList.add('pixel');
+      pixel.id = wallsArray[i][j].name.slice(1);
+      if (!wallsArray[i][j].safe) {
+        pixel.classList.add('wall');
+      }
+      board.append(pixel);
+    }
+  }
+  let x = enemyPoint[0];
+  let y = enemyPoint[1];
+  $(wallsArray[x][y].name).addClass('enemy');
+  x = playerPoint[0];
+  y = playerPoint[1];
+  $(wallsArray[x][y].name).addClass('player');
 }
 
 //Function 10 - This is where the system will verify that there is a valid path from the enemy to the player. It uses the BFS pathfinding algorithm and returns either "false" (if there is no path) or an array of the path from the enemy to the player.
