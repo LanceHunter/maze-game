@@ -274,16 +274,18 @@ function turnIsOver() {
   //Shows player a "Time Up" screen
   let timeUpScreen = document.createElement('div');
   timeUpScreen.classList.add('timeUpScreen');
+  timeUpScreen.classList.add('valign-wrapper');
   timeUpScreen.id = `timeUpScreen`;
-  timeUpScreen.innerText = 'Time is up!';
+  timeUpScreen.innerHTML = `<span class="insideButton">Time is up!</span>`;
   game.prepend(timeUpScreen);
   window.setTimeout(function() {
-    timeUpScreen.innerText = 'Player 2 click to begin';
+    timeUpScreen.innerHTML = `<span class="insideButton center-align">Player 2 click to begin</span>`;
     if (pathBackTotal) {
       $(`#timeUpScreen`).click(playerTwoTurn);
     } else {
       winner = 2;
-      timeUpScreen.innerText = 'You Walled Yourself off! Player 2 Wins!';
+      timeUpScreen.style.backgroundColor = "#e53935";
+      timeUpScreen.innerHTML = `<span class="insideButton center-align">No walling off!<br><br>Player 2 Wins!<br><br>Click to play again</span>`;
       $(`#timeUpScreen`).click(function() {
         location.reload(true);
       }); //Need to update function!!!
@@ -357,11 +359,11 @@ function gameIsOver() {
   if (winner === 1) {
     timeUpScreen.classList.remove('hide');
     timeUpScreen.style.backgroundColor = "#4caf50";
-    timeUpScreen.innerText = "Player 1 Wins! Click to play again!"
+    timeUpScreen.innerHTML = `<span class="insideButton center-align">Player 1 Wins!<br><br>Click to play again</span>`;
   } else {
     timeUpScreen.classList.remove('hide');
     timeUpScreen.style.backgroundColor = "#e53935";
-    timeUpScreen.innerText = "Player 2 Wins! Click to play again!"
+    timeUpScreen.innerHTML = `<span class="insideButton center-align">Player 2 Wins!<br><br>Click to play again</span>`;
   }
 
   $('#timeUpScreen').click(function() {
