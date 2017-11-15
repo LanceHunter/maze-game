@@ -152,15 +152,13 @@ function startScreen() {
   startButton.classList.add('center-align');
   startButton.classList.add('valign-wrapper');
   startButton.id = `startButton`;
-//  startButton.innerText = `Start`;
 
-  //Creating the options button.
-  let optionButton = document.createElement('div');
-  optionButton.classList.add('optionButton');
-  optionButton.classList.add('center-align');
-  optionButton.classList.add('valign-wrapper');
-  optionButton.id = `optionButton`;
-//  optionButton.innerHtml = `<i class="material-icons">play_arrow</i>`;
+  //Creating the button that toggles between 1-player and 2-player mode.
+  let twoPlayerModeButton = document.createElement('div');
+  twoPlayerModeButton.classList.add('optionButton');
+  twoPlayerModeButton.classList.add('center');
+  twoPlayerModeButton.classList.add('valign-wrapper');
+  twoPlayerModeButton.id = `twoPlayerModeButton`;
 
   //Creating the tutorial button.
   let tutorialButton = document.createElement('div');
@@ -179,7 +177,7 @@ function startScreen() {
   //Adding the title, start button, and option button to the start screen div.
 //  startPage.append(startLogo);
   startPage.append(startButton);
-  startPage.append(optionButton);
+  startPage.append(twoPlayerModeButton);
   startPage.append(tutorialButton);
 
   //Creating a click listener for the start button that begins the game.
@@ -191,19 +189,24 @@ function startScreen() {
     startGame();
   });
 
-  //Creating a click listener for the options button that brings up the options screen.
-  let $optionButton = $('#optionButton');
-  $optionButton.append(`<span class='insideButton'>Options</span>`);
-  $optionButton.click(function() {
-    startPage.classList.toggle('hide');
-    console.log('Option Button Pressed!');
-    if ($(`#optionPage`).length !== 0) {
-      optionPage.classList.toggle('hide');
+  //Creating a click listener for the twoPlayerMade button that toggles between 1 and 2 player mode the start page back.
+  let $twoPlayerModeButton = $('#twoPlayerModeButton');
+  $twoPlayerModeButton.append(`<span class='insideButton' id='onePlayerText'>One Player</span>`);
+  $twoPlayerModeButton.append(`<span class='insideButton hide' id='twoPlayerText'>Two Players</span>`);
+  $twoPlayerModeButton.click(function() {
+    if (twoPlayerMode) {
+      $('#onePlayerText').toggleClass('hide');
+      $('#twoPlayerText').toggleClass('hide');
+      console.log('Changed to 1 player mode!');
+      twoPlayerMode = false;
     } else {
-      optionsPage();
-      console.log('Creating Options Page!');
+      $('#onePlayerText').toggleClass('hide');
+      $('#twoPlayerText').toggleClass('hide');
+      console.log('Changed to 2 player mode!');
+      twoPlayerMode = true;
     }
   });
+
 
   //Creating a click listener for the tutorial button that opens the tutorial video.
   let $tutorialButton = $('#tutorialButton');
@@ -256,11 +259,7 @@ for (i=0; i<400; i++) {
 //Function 5 - This function shows that the player's time is over. Calls functions to pass the walls to an array and verify that there is a valid path (eventually). Blanks out the screen and then tells player 2 that it is their turn.
 function turnIsOver() {
   //Removing all the eventlisteners that happened on player one's turn.
-  board.removeEventListener('click', makeWall);
-  board.removeEventListener('mousedown', dragToDraw);
-  board.removeEventListener('mouseup', function() {
-    board.removeEventListener('mouseover', makeWall);
-  });
+  $('board').off();
   let tempArray = passWallsToArray(); //This array holds the returned array.
   pathBackTotal = verifyValidPath(tempArray[0], tempArray[1], tempArray[2]);
   //Hides the board so it can't be seen by player 2.
@@ -285,18 +284,17 @@ function turnIsOver() {
 
 //Function 6 - This function hides the timeUpScreen and makes the board visible again. If then calls the function to show the player a timer - createTimer(), and passes it 30 seconds. It also has a window.setTimeout that calls the function gameIsOver() after 30 seconds. Finally, if we are in twoPlayerMode it adds an eventListener that calls the function - makeEnemyLine() when the board is clicked. (If we are not in twoPlayerMode, it will draw the enemy line at an interval determined in the options.)
 function playerTwoTurn() {
-  timeUpScreen.classList.toggle('hide');
-  board.classList.toggle('hide');
+  $(`#timeUpScreen`).addClass('hide');
+  $(`#board`).removeClass('hide');
   createTimer(10000); //Note this is temporarily set to 10 seconds.
   window.setTimeout(gameIsOver, 10000); //Note this is temporarily set to 10 seconds
   if (twoPlayerMode) {
-    board.addEventListener('click', makeEnemyLine);
-    board.addEventListener('mousedown', dragToDrawEnemy);
+    enemyDrawNow();
   } else {
     let aiAttack = window.setInterval(function() {
       let changingPixel = pathBackTotal.shift();
       $(changingPixel).addClass('enemy');
-      if ($(changingPixel).hasClass('player')) {
+      if ($(changingPixel).hasClass('player') && !gameEnded) {
         winner = 2;
         clearInterval(aiAttack);
         gameIsOver();
@@ -341,20 +339,16 @@ function makeEnemyLine() {
 
 //Function 8 - This function removes the eventListener for the clicks on the board that allows enemy lines to be made, and the eventListener on the timeUpScreen that starts player 2's turn. It also hides the board and removes the timer. Then, if the global variable "winner" is "1", the player 1 wins screen is displayed. If global variable "winner" is "2", the player 2 wins screen is displayed.
 function gameIsOver() {
-  board.removeEventListener('click', makeEnemyLine);
-  board.removeEventListener('mouseover', makeEnemyLine);
-  board.removeEventListener('mouseup', function() {
-    board.removeEventListener('mouseover', makeEnemyLine);
-  });
-  timeUpScreen.removeEventListener('click', gameIsOver);
-  timeUpScreen.removeEventListener('click', playerTwoTurn);
-
+  gameEnded = true;
+  $(`#board`).off();
+  $(`#timeUpScreen`).off();
 
   board.classList.add('hide');
   $('#timer').remove();
   if (winner === 1) {
     timeUpScreen.classList.remove('hide');
     timeUpScreen.style.backgroundColor = "#4caf50";
+    timeUpScreen.style.opacity = "0.5";
     timeUpScreen.innerText = "Player 1 Wins! Click to play again!"
   } else {
     timeUpScreen.classList.remove('hide');
@@ -539,9 +533,11 @@ function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
 
 //Function 11 - This function puts a timer on the page below the board so player can see how much time they of the enemy have left in their turn. It takes in an argument of how much time is left, which will either be 60000 for player or 30000 for enemy.
 function createTimer(timeLeft) {
-  let visibleTimer = document.createElement('h1');
+  let visibleTimer = document.createElement('div');
   game.append(visibleTimer);
   visibleTimer.classList.add('timer');
+  visibleTimer.classList.add('grey-text');
+  visibleTimer.classList.add('text-lighten-4');
   visibleTimer.classList.add('center');
   visibleTimer.id = `timer`;
   let counter = setInterval(function() {
@@ -578,6 +574,13 @@ function drawNow() {
   $(`#board`).mousedown(dragToDraw);
 }
 
+//Function 13.5 - This sets the eventlisteners that allow enemy to draw their line.
+
+function enemyDrawNow() {
+  $(`#board`).click(makeEnemyLine);
+  $(`#board`).mousedown(dragToDrawEnemy);
+}
+
 //Function 14 - This is the function called by the event listener in drawNow().
 function makeWall() {
   let square = document.getElementById(event.target.id);
@@ -598,73 +601,13 @@ function dragToDraw() {
 
 //Function 16 - Allowing drag-to-draw for creating enemy line. This creates eventlisteners for mouseover that calls makeEnemyLine() for each instance while the mouse is down.
 function dragToDrawEnemy() {
-  board.addEventListener('mouseover', makeEnemyLine);
-  board.addEventListener('mouseup', function() {
-    board.removeEventListener('mouseover', makeEnemyLine);
+  $(`#board`).mouseover(makeEnemyLine);
+  $(`#board`).mouseup(function() {
+    $(`#board`).off();
+    enemyDrawNow();
   });
 }
 
-//Function 17 - This is the options screen, where player can select if they want 1-player or 2-player mode, and select the difficulty of 1-player mode.
-function optionsPage() {
-  //Creating the blank white Option Page background.
-  let optionPage = document.createElement('div');
-  optionPage.classList.add('optionPage');
-  optionPage.classList.add('center');
-  optionPage.id = `optionPage`;
-  game.append(optionPage);
-
-  let returnButton = document.createElement('div');
-  returnButton.classList.add('optionButton');
-  returnButton.classList.add('center');
-  returnButton.classList.add('valign-wrapper');
-  returnButton.id = `returnButton`;
-
-  let twoPlayerModeButton = document.createElement('div');
-  twoPlayerModeButton.classList.add('optionButton');
-  twoPlayerModeButton.classList.add('center');
-  twoPlayerModeButton.classList.add('valign-wrapper');
-  twoPlayerModeButton.id = `twoPlayerModeButton`;
-
-
-  //Creating the logo (and a helpful breakline insert).
-  let optionsLogo = document.createElement('h1');
-  let breakLine = document.createElement('br');
-  optionsLogo.innerText = `Maze Game - Options`;
-
-  //Adding the twoPlayerMade, difficulty, and return button to the start screen div.
-  optionPage.append(twoPlayerModeButton);
-  optionPage.append(optionsLogo);
-  optionPage.append(returnButton);
-
-  //Creating a click listener for the return button that brings the start page back.
-  let $returnButton = $('#returnButton');
-  $returnButton.append(`<span class='insideButton'>Return</span>`);
-  $returnButton.click(function() {
-    optionPage.classList.toggle('hide');
-    startPage.classList.toggle('hide');
-    console.log('Return Button Pressed!');
-  });
-
-  //Creating a click listener for the twoPlayerMade button that toggles between 1 and 2 player mode the start page back.
-  let $twoPlayerModeButton = $('#twoPlayerModeButton');
-  $twoPlayerModeButton.append(`<span class='insideButton' id='onePlayerText'>One Player</span>`);
-  $twoPlayerModeButton.append(`<span class='insideButton hide' id='twoPlayerText'>Two Players</span>`);
-  $twoPlayerModeButton.click(function() {
-    if (twoPlayerMode) {
-      $('#onePlayerText').toggleClass('hide');
-      $('#twoPlayerText').toggleClass('hide');
-      console.log('Changed to 1 player mode!');
-      twoPlayerMode = false;
-    } else {
-      $('#onePlayerText').toggleClass('hide');
-      $('#twoPlayerText').toggleClass('hide');
-      console.log('Changed to 2 player mode!');
-      twoPlayerMode = true;
-    }
-  });
-
-
-}
 
 
 
