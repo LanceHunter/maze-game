@@ -17,7 +17,7 @@ Prologue - global variables:
 ===========
 
 Function 1 - startScreen()
-  Created the start screen for the game. Created a div for the start page, and puts the game title, a start button, and an options button on that div. If then created a click listener for the start and option button. The click listener for the start button calls 'startGame' and the click listener for the options button will call that function once it is written.
+  Created the start screen for the game. Created a div for the start page, and puts a start button, a 1/2 player toggle button, and a tutorial button on that div. If then created a click listener for all three buttons. The click listener for the start button calls 'startGame', the click listener for the 1/2 player toggle button will change the game mode from 1 player to 2 player, the click listener for the tutorial button will call the Vimeo API to display a tutorial video.
 
 ===========
 
@@ -69,6 +69,12 @@ Function 9 - passWallsToArray()
 
 ===========
 
+Function 9.5 makePlayerTwoBoard()
+
+  This creates a second div that is added to the board with the same walls and player/enemy locations as the original, so that any mouse holdover events from the previous board div aren't carried over.
+
+===========
+
 Function 10 - verifyValidPath()
 
   This is where the system will verify that there is a valid path from the enemy to the player. It takes 3 arguments, the 2d array of the grid, the array of the enemy's location, and the array of the player's location. It will either return "false" (if there is no valid path) or a map of the coordinates between the points.
@@ -112,9 +118,9 @@ Function 16 dragToDrawEnemy()
 
 ===========
 
-Function 17 optionsPage()
+Function 17 tutorialTime()
 
-  This is the options screen, where player can select if they want 1-player or 2-player mode, and select the difficulty of 1-player mode.
+This function will call up tutorial video and begin playing it.
 
 ===========
 
@@ -155,7 +161,7 @@ function startScreen() {
 
   //Creating the button that toggles between 1-player and 2-player mode.
   let twoPlayerModeButton = document.createElement('div');
-  twoPlayerModeButton.classList.add('optionButton');
+  twoPlayerModeButton.classList.add('twoPlayerModeButton');
   twoPlayerModeButton.classList.add('center');
   twoPlayerModeButton.classList.add('valign-wrapper');
   twoPlayerModeButton.id = `twoPlayerModeButton`;
@@ -164,18 +170,14 @@ function startScreen() {
   let tutorialButton = document.createElement('div');
   tutorialButton.classList.add('tutorialButton');
   tutorialButton.classList.add('valign-wrapper');
-//  tutorialButton.classList.add('center-align');
   tutorialButton.id = `tutorialButton`;
-//  tutorialButton.innerText = `Tutorial`;
 
 
   //Creating the logo (and a helpful breakline insert).
   let startLogo = document.createElement('h1');
   let breakLine = document.createElement('br');
-  tutorialButton.classList.add('center');
 
   //Adding the title, start button, and option button to the start screen div.
-//  startPage.append(startLogo);
   startPage.append(startButton);
   startPage.append(twoPlayerModeButton);
   startPage.append(tutorialButton);
@@ -191,8 +193,8 @@ function startScreen() {
 
   //Creating a click listener for the twoPlayerMade button that toggles between 1 and 2 player mode the start page back.
   let $twoPlayerModeButton = $('#twoPlayerModeButton');
-  $twoPlayerModeButton.append(`<span class='insideButton' id='onePlayerText'>One Player</span>`);
-  $twoPlayerModeButton.append(`<span class='insideButton hide' id='twoPlayerText'>Two Players</span>`);
+  $twoPlayerModeButton.append(`<span class='insideButton' id='onePlayerText'>1 Player</span>`);
+  $twoPlayerModeButton.append(`<span class='insideButton hide' id='twoPlayerText'>2 Players</span>`);
   $twoPlayerModeButton.click(function() {
     if (twoPlayerMode) {
       $('#onePlayerText').toggleClass('hide');
@@ -213,7 +215,7 @@ function startScreen() {
   $tutorialButton.append(`<span class='insideButton'>Tutorial</span>`);
   $tutorialButton.click(function() {
 //    startPage.classList.toggle('hide');
-    console.log('Tutorial Button Pressed!');
+    tutorialTime();
   });
 
 }
@@ -292,7 +294,7 @@ function turnIsOver() {
 //Function 6 - This function hides the timeUpScreen and makes the board visible again. If then calls the function to show the player a timer - createTimer(), and passes it 30 seconds. It also has a window.setTimeout that calls the function gameIsOver() after 30 seconds. Finally, if we are in twoPlayerMode it adds an eventListener that calls the function - makeEnemyLine() when the board is clicked. (If we are not in twoPlayerMode, it will draw the enemy line at an interval determined in the options.)
 function playerTwoTurn() {
   $(`#timeUpScreen`).addClass('hide');
-  $(`#timer`).removeClass('hide');
+  $(`#board`).removeClass('hide');
   createTimer(10000); //Note this is temporarily set to 10 seconds.
   window.setTimeout(gameIsOver, 10000); //Note this is temporarily set to 10 seconds
   if (twoPlayerMode) {
@@ -395,7 +397,7 @@ function passWallsToArray() {
   return([wallsArray, enemyPoint, playerPoint]);
 }
 
-//Function 9.5 - This will create a second div to be added to the board with the same walls and locations as the original, so that any mouse holdover events from the previous board div aren't carried over.
+//Function 9.5 - This creates a second div that is added to the board with the same walls and player/enemy locations as the original, so that any mouse holdover events from the previous board div aren't carried over.
 
 function makePlayerTwoBoard(wallsArray, enemyPoint, playerPoint) {
   let board = document.createElement('div');
@@ -420,6 +422,7 @@ function makePlayerTwoBoard(wallsArray, enemyPoint, playerPoint) {
   x = playerPoint[0];
   y = playerPoint[1];
   $(wallsArray[x][y].name).addClass('player');
+  $(`#board`).addClass('hide');
 }
 
 //Function 10 - This is where the system will verify that there is a valid path from the enemy to the player. It uses the BFS pathfinding algorithm and returns either "false" (if there is no path) or an array of the path from the enemy to the player.
@@ -436,7 +439,6 @@ function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
   queue.push(wallsArray[(enemyPoint[0])][(enemyPoint[1])]);
   while ((queue.length !== 0) && !playerPointObject.visited) {
     let currentSquare = queue.shift();
-//    console.log(currentSquare);
     //This is where it gets weird...
 
     //First we verify that there is an upper-Left square.
@@ -451,7 +453,6 @@ function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
         queue.push(upLeftSquare);
       }
     }
-
     //Then we verify that there is an upper-center square.
     if ((currentSquare.coordinates[0]-1)>=0) {
       let upCenterSquare = wallsArray[(currentSquare.coordinates[0]-1)][(currentSquare.coordinates[1])];
@@ -464,7 +465,6 @@ function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
         queue.push(upCenterSquare);
       }
     }
-
     //Then we verify that there is an upper-right square.
     if (((currentSquare.coordinates[0]-1)>=0) && ((currentSquare.coordinates[1]+1)<=19)) {
       let upRightSquare = wallsArray[(currentSquare.coordinates[0]-1)][(currentSquare.coordinates[1]+1)];
@@ -477,7 +477,6 @@ function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
         queue.push(upRightSquare);
       }
     }
-
     //Then we verify that there is an center-left square.
     if ((currentSquare.coordinates[1]-1)>=0) {
       let centerLeftSquare = wallsArray[currentSquare.coordinates[0]][(currentSquare.coordinates[1]-1)];
@@ -490,7 +489,6 @@ function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
         queue.push(centerLeftSquare);
       }
     }
-
     //Then we verify that there is an center-right square.
     if ((currentSquare.coordinates[1]+1)<=19) {
       let centerRightSquare = wallsArray[currentSquare.coordinates[0]][(currentSquare.coordinates[1]+1)];
@@ -503,7 +501,6 @@ function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
         queue.push(centerRightSquare);
       }
     }
-
     //Then we verify that there is an bottom-left square.
     if (((currentSquare.coordinates[0]+1)<=19) && ((currentSquare.coordinates[1]-1)>=0)) {
       let bottomLeftSquare = wallsArray[(currentSquare.coordinates[0]+1)][(currentSquare.coordinates[1]-1)];
@@ -516,7 +513,6 @@ function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
         queue.push(bottomLeftSquare);
       }
     }
-
     //Then we verify that there is an bottom-center square.
     if ((currentSquare.coordinates[0]+1)<=19) {
       let bottomCenterSquare = wallsArray[(currentSquare.coordinates[0]+1)][(currentSquare.coordinates[1])];
@@ -529,7 +525,6 @@ function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
         queue.push(bottomCenterSquare);
       }
     }
-
     //Finally, we verify that there is an bottom-right square.
     if (((currentSquare.coordinates[0]+1)<=19) && ((currentSquare.coordinates[1]+1)<=19)) {
       let bottomRightSquare = wallsArray[(currentSquare.coordinates[0]+1)][(currentSquare.coordinates[1]+1)];
@@ -545,10 +540,11 @@ function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
   }
 
   //We have now found if there is a path. We will now check to see if there path is there by seeing if the playerPointObject was visited...
-
   if (!playerPointObject.visited) {
+    //If it wasn't, there is no path and we return 'False'.
     return false;
   } else {
+    //If there was, then we return an array of the path from the enemy to the player.
     let pathBack = [];
     pathBack.unshift(playerPointObject.name);
     let pathBackSpot = playerPointObject.predecessorCoordinates;
@@ -641,7 +637,30 @@ function dragToDrawEnemy() {
   });
 }
 
+//Function 17 -
 
+function tutorialTime() {
+  $(`#startPage`).addClass('hide');
+  game.append(`<div class="startPage" id="tutorialPage"></div>`);
+
+  $(`#tutorialPage`).prepend(`<iframe id="tutorialVidPlayer" width="640" height="360" type="text/html" src="http://www.youtube.com/embed/jimT1nZbM04?enablejsapi=1" frameborder="0"></iframe>`);
+
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('tutorialVidPlayer', {
+      playerVars: {
+        'autoplay': 1,
+        'controls': 0
+      },
+      events: {
+        'onReady': onPlayerReady,
+        'onStateChange': onPlayerStateChange
+      }
+    });
+  }
+
+
+
+}
 
 
 //Calling startScreen now to run game while testing
