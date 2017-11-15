@@ -149,28 +149,27 @@ function startScreen() {
   startButton.classList.add('startButton');
   startButton.classList.add('center');
   startButton.id = `startButton`;
-  startButton.innerText = `Start`;
+//  startButton.innerText = `Start`;
 
   //Creating the options button.
   let optionButton = document.createElement('div');
   optionButton.classList.add('optionButton');
   optionButton.classList.add('center');
   optionButton.id = `optionButton`;
-  optionButton.innerText = `Options`;
+//  optionButton.innerHtml = `<i class="material-icons">play_arrow</i>`;
 
   //Creating the tutorial button.
   let tutorialButton = document.createElement('div');
   tutorialButton.classList.add('tutorialButton');
   tutorialButton.classList.add('center');
   tutorialButton.id = `tutorialButton`;
-  tutorialButton.innerText = `Tutorial`;
+//  tutorialButton.innerText = `Tutorial`;
 
 
   //Creating the logo (and a helpful breakline insert).
   let startLogo = document.createElement('h1');
   let breakLine = document.createElement('br');
   tutorialButton.classList.add('center');
-  startLogo.innerText = `Maze Game!`;
 
   //Adding the title, start button, and option button to the start screen div.
 //  startPage.append(startLogo);
@@ -180,6 +179,7 @@ function startScreen() {
 
   //Creating a click listener for the start button that begins the game.
   let $startButton = $('#startButton');
+  $startButton.append(`<span>Start</span>`);
   $startButton.click(function() {
     startPage.classList.toggle('hide');
     console.log('Start Button Pressed!');
@@ -188,6 +188,7 @@ function startScreen() {
 
   //Creating a click listener for the options button that brings up the options screen.
   let $optionButton = $('#optionButton');
+  $optionButton.append(`<span>Options</span>`);
   $optionButton.click(function() {
     startPage.classList.toggle('hide');
     console.log('Option Button Pressed!');
@@ -198,6 +199,15 @@ function startScreen() {
       console.log('Creating Options Page!');
     }
   });
+
+  //Creating a click listener for the tutorial button that opens the tutorial video.
+  let $tutorialButton = $('#tutorialButton');
+  $tutorialButton.append(`<span>Tutorial</span>`);
+  $tutorialButton.click(function() {
+    startPage.classList.toggle('hide');
+    console.log('Tutorial Button Pressed!');
+  });
+
 }
 
 

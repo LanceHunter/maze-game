@@ -42,22 +42,23 @@ main {
 
 .optionButton {
   border-radius: 250px;
-  padding: 100px;
   width: 50%;
+  height: 50%;
   background-color: #e53935;
 }
 
 .startButton {
   border-radius: 250px;
-  padding: 100px;
   width: 100%;
+  height: 50%;
+  margins:none;
   background-color: #4caf50;
 }
 
 .tutorialButton {
   border-radius: 250px;
-  padding: 100px;
   width: 50%;
+  height: 50%;
   background-color: #e53935;
 }
 
