@@ -187,7 +187,7 @@ function startScreen() {
   $startButton.append(`<span class='insideButton'>Start</span>`);
   $startButton.click(function() {
     startPage.classList.toggle('hide');
-    console.log('Start Button Pressed!');
+//    console.log('Start Button Pressed!');
     startGame();
   });
 
@@ -199,12 +199,12 @@ function startScreen() {
     if (twoPlayerMode) {
       $('#onePlayerText').toggleClass('hide');
       $('#twoPlayerText').toggleClass('hide');
-      console.log('Changed to 1 player mode!');
+//      console.log('Changed to 1 player mode!');
       twoPlayerMode = false;
     } else {
       $('#onePlayerText').toggleClass('hide');
       $('#twoPlayerText').toggleClass('hide');
-      console.log('Changed to 2 player mode!');
+//      console.log('Changed to 2 player mode!');
       twoPlayerMode = true;
     }
   });
@@ -215,7 +215,7 @@ function startScreen() {
   $tutorialButton.append(`<span class='insideButton'>Tutorial</span>`);
   $tutorialButton.click(function() {
 //    startPage.classList.toggle('hide');
-    tutorialTime();
+//    tutorialTime();
   });
 
 }
@@ -229,8 +229,8 @@ function startGame() {
   }
   let startingPlaces = piecePlacement();
   createBoard();
-  createTimer(10000); //Note this is set to 10 seconds for now.
-  window.setTimeout(turnIsOver, 10000); //Note this is set to 10 seconds for now.
+  createTimer(60000); //Note this is set to 10 seconds for now.
+  window.setTimeout(turnIsOver, 60000); //Note this is set to 10 seconds for now.
   let playerStart = $(`#pixel${startingPlaces[0]}`);
   let enemyStart = $(`#pixel${startingPlaces[1]}`);
   playerStart.addClass('player');
@@ -297,8 +297,8 @@ function turnIsOver() {
 function playerTwoTurn() {
   $(`#timeUpScreen`).addClass('hide');
   $(`#board`).removeClass('hide');
-  createTimer(10000); //Note this is temporarily set to 10 seconds.
-  window.setTimeout(gameIsOver, 10000); //Note this is temporarily set to 10 seconds
+  createTimer(30000); //Note this is temporarily set to 10 seconds.
+  window.setTimeout(gameIsOver, 30000); //Note this is temporarily set to 10 seconds
   if (twoPlayerMode) {
     enemyDrawNow();
   } else {
@@ -333,7 +333,7 @@ function makeEnemyLine() {
       enemyBuffer.push(`pixel${(i+21)}`);
     }
   }
-  console.log(enemyBuffer);
+//  console.log(enemyBuffer);
 
 
   if ((!($(`#${event.target.id}`).hasClass('wall'))) && (enemyBuffer.includes(event.target.id))) {
@@ -341,7 +341,7 @@ function makeEnemyLine() {
   }
 
   if (($(`#${event.target.id}`).hasClass('player')) && (enemyBuffer.includes(event.target.id))) {
-    console.log('Player 2 Wins!');
+//    console.log('Player 2 Wins!');
     winner = 2;
     gameIsOver();
   }
@@ -429,14 +429,14 @@ function makePlayerTwoBoard(wallsArray, enemyPoint, playerPoint) {
 
 //Function 10 - This is where the system will verify that there is a valid path from the enemy to the player. It uses the BFS pathfinding algorithm and returns either "false" (if there is no path) or an array of the path from the enemy to the player.
 function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
-  console.log(wallsArray);
-  console.log("Enemy point " + enemyPoint[0], ' ', + enemyPoint[1]);
-  console.log("Player point " + playerPoint[0], ' ', + playerPoint[1]);
+//  console.log(wallsArray);
+//  console.log("Enemy point " + enemyPoint[0], ' ', + enemyPoint[1]);
+//  console.log("Player point " + playerPoint[0], ' ', + playerPoint[1]);
 
   //BFS Pathfinding Algorithm ahoy!
 
   let playerPointObject = wallsArray[(playerPoint[0])][(playerPoint[1])];
-  console.log(playerPointObject);
+//  console.log(playerPointObject);
   let queue = [];
   queue.push(wallsArray[(enemyPoint[0])][(enemyPoint[1])]);
   while ((queue.length !== 0) && !playerPointObject.visited) {
@@ -552,8 +552,8 @@ function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
     let pathBackSpot = playerPointObject.predecessorCoordinates;
     for (i = 0; i< playerPointObject.distance; i++) {
       pathBack.unshift(wallsArray[pathBackSpot[0]][pathBackSpot[1]].name);
-      console.log(wallsArray[pathBackSpot[0]][pathBackSpot[1]].predecessorCoordinates);
-      console.log(pathBack);
+//      console.log(wallsArray[pathBackSpot[0]][pathBackSpot[1]].predecessorCoordinates);
+//      console.log(pathBack);
       pathBackSpot = wallsArray[pathBackSpot[0]][pathBackSpot[1]].predecessorCoordinates;
     }
     return(pathBack);
