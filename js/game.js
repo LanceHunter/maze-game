@@ -259,7 +259,8 @@ for (i=0; i<400; i++) {
 //Function 5 - This function shows that the player's time is over. Calls functions to pass the walls to an array and verify that there is a valid path (eventually). Blanks out the screen and then tells player 2 that it is their turn.
 function turnIsOver() {
   //Removing all the eventlisteners that happened on player one's turn.
-  $('board').off();
+  $('#board').off();
+  $(`#timer`).addClass('hide');
   let tempArray = passWallsToArray(); //This array holds the returned array.
   pathBackTotal = verifyValidPath(tempArray[0], tempArray[1], tempArray[2]);
   //Hides the board so it can't be seen by player 2.
@@ -286,6 +287,7 @@ function turnIsOver() {
 function playerTwoTurn() {
   $(`#timeUpScreen`).addClass('hide');
   $(`#board`).removeClass('hide');
+  $(`#timer`).removeClass('hide');
   createTimer(10000); //Note this is temporarily set to 10 seconds.
   window.setTimeout(gameIsOver, 10000); //Note this is temporarily set to 10 seconds
   if (twoPlayerMode) {
