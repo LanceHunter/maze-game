@@ -118,10 +118,6 @@ Function 16 dragToDrawEnemy()
 
 ===========
 
-Function 17 tutorialTime()
-
-This function will call up tutorial video and begin playing it.
-
 ===========
 
 Epilogue - Functions and variables that deal with clicks outside of the game. Mostly Materialize toasts.
@@ -639,31 +635,6 @@ function dragToDrawEnemy() {
   });
 }
 
-//Function 17 -
-
-function tutorialTime() {
-  $(`#startPage`).addClass('hide');
-  game.append(`<div class="startPage" id="tutorialPage"></div>`);
-
-  $(`#tutorialPage`).prepend(`<iframe id="tutorialVidPlayer" width="640" height="360" type="text/html" src="http://www.youtube.com/embed/jimT1nZbM04?enablejsapi=1" frameborder="0"></iframe>`);
-
-  function onYouTubeIframeAPIReady() {
-    player = new YT.Player('tutorialVidPlayer', {
-      playerVars: {
-        'autoplay': 1,
-        'controls': 0
-      },
-      events: {
-        'onReady': onPlayerReady,
-        'onStateChange': onPlayerStateChange
-      }
-    });
-  }
-
-
-
-}
-
 
 //Calling startScreen now to run game while testing
 startScreen();
@@ -673,17 +644,12 @@ startScreen();
 
 // Epilogue - The following are functions dealing with Materialize and links on the page outside the actual game.
 
-//Getting the 'High Scores' and 'How to play' links.
+//Getting the 'High Scores' links.
 let highScores = $('#highScores');
-let about = $('#about');
 
 //Displays the high scores in a toast when the High Scores link is clicked.
 highScores.click(function() {
   Materialize.toast(`<ol><h2>High Scores</h2><li>Testing</li><li>Still Testing</li></ol>`, 15000);
-});
-
-about.click(function() {
-  Materialize.toast(`You have sixty seconds to draw walls and create a maze between yourself and the enemy. When you are finished, the enemy has thirty seconds to reach you. Be careful not to wall yourself off!`, 15000);
 });
 
 
