@@ -22,7 +22,7 @@ Requirements:
 - Utilize a way-finding algorithm to verify that there is a valid path between the two dots after walls are set.
 - Ability for player to cancel or reset game.
 - Ability for player to set difficulty.
-- Ability for “AI” to draw line from their dot to player dot at set pace (pace based on player’s selected difficulty).
+- Ability for “AI” to draw line from their dot to player dot at set pace.
 - Ability to display a winning or losing screen.
 - Ability to keep score.
 - Utilize Facebook Games API to track player information.
