@@ -8,27 +8,26 @@ Prologue - global variables:
 
   The three global variables are:
     - "game", which is the jQuery search for the main game div on the page.
-    - "difficulty", which is the numerical value of the game difficulty.
     - "winner", which tells if player 1 or player 2 wins
     - "twoPlayerMode", a boolean determening if the game is in 2-player mode or not.
-    - "pathBackTotal", a global array with results of the pathfinding.
-    - "gameEnded", a global boolean that keeps the game from ending twice
+    - "pathBackTotal", a global variable that will either be an array with results of the pathfinding or the value of "false" if there is no path.
+    - "gameEnded", a global boolean that is marked as true when the game ends. This prevents the game from ending twice.
 
 ===========
 
 Function 1 - startScreen()
-  Created the start screen for the game. Created a div for the start page, and puts a start button, a 1/2 player toggle button, and a tutorial button on that div. If then created a click listener for all three buttons. The click listener for the start button calls 'startGame', the click listener for the 1/2 player toggle button will change the game mode from 1 player to 2 player, the click listener for the tutorial button will call the Vimeo API to display a tutorial video.
+  Created the start screen for the game. Creates a div for the start page, and puts a start button, a 1/2 player toggle button, and a tips button on that div. It then created a click listener for all three buttons. The click listener for the start button calls 'startGame', the click listener for the 1/2 player toggle button will change the game mode from 1 player to 2 player (toggling the boolean value of the global variable "twoPlayerMode"), and the click listener for the tutorial button will load the tutorial/tips page.
 
 ===========
 
 Function 2 - startGame()
-  This function starts the game, calling the function that places the player and enemy pixels - piecePlacement(), calling the function that starts the timer - createTimer() (and passing it 60 seconds), calling the function that puts a timer display on the screen turnIsOver() (also passing it 60 seconds), marks the player and the enemy pixels on the board, and calls the function that allows player to draw walls - drawNow().
+  This function starts the game, calling the function that places the player and enemy pixels - piecePlacement(), calling the function that creates the visual the timer - createTimer() (and passing it 60 seconds), calls a window.setTimeout method that will call turnIsOver() after 60 seconds, marks the player and the enemy pixels on the board, and calls the function that allows player to draw walls - drawNow().
 
 ===========
 
 Function 3 - createBoard()
 
-  This function create the maze board's div and calls the function that will add the pixels to the board - newBoard().
+  This function create the maze board's blank div and calls the function that will add the pixels to the board - newBoard().
 
 ===========
 
@@ -40,19 +39,19 @@ Function 4 - newBoard()
 
 Function 5 - turnIsOver()
 
-  This function shows that the player's time is over. It removes the eventListener that allows walls to be drawn. It then calls functions to pass the walls to an array - passWallsToArray() - and verify that there is a valid path - verifyValidPath(). It also blanks out the screen so neither player can see what has been drawn. Then, after 3 seconds it tells player 2 that it is their turn and puts an eventListener for a click that calls - playerTwoTurn().
+  This function shows that the player's time is over. It displays a timeUp screen. It then calls functions to pass the walls to an array - passWallsToArray(), and passes the array of returned values (the 2d-array of each pixel with its status, an array of the X & Y location of Player 2's pixel in that array, and an array of the X & Y location of Player 1's pixel) to a temporary holding array--"pathBackTotal". If then passes those three values in pathBackTotal to the function verifyValidPath(). After that it removes the old board from the screen and creates a new board with all the same information by calling makePlayerTwoBoard() and passing it the three values in pathBackTotal. Then, after 3 seconds it tells Player 2 that it is their turn and puts an eventListener for a click that calls - playerTwoTurn().
 
 ===========
 
 Function 6 - playerTwoTurn()
 
-  This function hides the timeUpScreen and makes the board visible again. If then calls the function to show the player a timer - createTimer(), and passes it 30 seconds. It also has a window.setTimeout that calls the function gameIsOver() after 30 seconds. Finally, it checks to see if we are in twoPlayerMode or not. If we are, it adds an eventListener that calls the function - makeEnemyLine() when the board is clicked. Otherwise, it has the enemyAI attack you at a pace determined by the difficulty.
+  This function hides the timeUpScreen and makes the board visible again. If then calls the function to show the player a timer - createTimer(), and passes it 30 seconds. It also has a window.setTimeout that calls the function gameIsOver() after 30 seconds. Finally, if we are in twoPlayerMode it adds an eventListener that calls the function - makeEnemyLine() when the board is clicked. (If we are not in twoPlayerMode, it will draw the enemy line at 1 square every 300ms.).
 
 ===========
 
 Function 7 - makeEnemyLine()
 
-  This function allows the enemy (player 2) to draw their line to the player's pixel. It first creates an array of the pixels that are directly around the original enemy pixel. If the enemy has clicked on any of the pixels that are in the array, that pixel is then part of the enemy's "line" and the pixels around that new enemy pixel are added to the array. If enemy's pixel reaches the player pixel before the time is up, gameisOver() is called.
+  This function draws Player 2's line to Player 1's pixel. It first creates an array of the pixels that are directly around Player 2's pixel. If Player 2 has clicked or dragged on any of the pixels that are in the array, that pixel is then part of the Player 2's "line" and the pixels around that new part of the line are added to the array. If Player 2's pixel reaches Player 1's pixel before the time is up, global variable "winner" is set to "2" and gameisOver() is called.
 
 ===========
 
@@ -131,7 +130,6 @@ Epilogue - Functions and variables that deal with clicks outside of the game. Mo
 
 //Getting the game div from the page.
 let game = $('#game');
-let difficulty = 0;
 let winner = 1;
 let twoPlayerMode = false;
 let pathBackTotal;
@@ -139,7 +137,8 @@ let gameEnded = false;
 
 
 
-// Function 1 - This function creates the start screen with the game title, the "start" button, and "options" button.
+// Function 1 -
+
 function startScreen() {
   //Creating the blank white Start Page background.
   let startPage = document.createElement('div');
@@ -204,32 +203,30 @@ function startScreen() {
     }
   });
 
-  //Creating a click listener for the tutorial button that loads the tutorial page.
+  //Creating text for the Tips/tutorial button.
   let $tutorialButton = $('#tutorialButton');
-//  $tutorialButton.append(`<a href='./tutorial.html'></a>`);
   $tutorialButton.append(`<span class='insideButton'>Tips</span>`);
 
 }
 
 
-//Function 2 - This function starts the game, creating the board, placing the player and enemy pixels, starting the timer, and calling the function that allows the first player to draw walls.
+//Function 2 -
 function startGame() {
   if ($('#timeUpScreen').length !== 0) {
     $('#timeUpScreen').off();
   }
   let startingPlaces = piecePlacement();
   createBoard();
-  createTimer(60000); //Note this is set to 10 seconds for now.
-  window.setTimeout(turnIsOver, 60000); //Note this is set to 10 seconds for now.
+  createTimer(60000); //Sending the visual timer 60 seconds for Player 1 turn.
+  window.setTimeout(turnIsOver, 60000); //The real timer that marks end of turn.
   $(`#pixel${startingPlaces[0]}`).addClass('player');
   let enemyStart = $(`#pixel${startingPlaces[1]}`);
-//  playerStart;
   enemyStart.addClass('enemy');
   drawNow();
 }
 
 
-//Function 3 - This function create the maze board's div and calls the function that will add the pixels to the board.
+//Function 3 -
 function createBoard() {
   let board = document.createElement('div');
   board.classList.add('board');
@@ -238,7 +235,7 @@ function createBoard() {
   newBoard();
 }
 
-//Function 4 - This function adds the pixels of the blank maze to the maze board.
+//Function 4 -
 function newBoard() {
 for (i=0; i<400; i++) {
   let pixel = document.createElement('div');
@@ -248,15 +245,13 @@ for (i=0; i<400; i++) {
   }
 }
 
-//Function 5 - This function shows that the player's time is over. Calls functions to pass the walls to an array and verify that there is a valid path (eventually). Blanks out the screen and then tells player 2 that it is their turn.
+//Function 5 -
 function turnIsOver() {
   //Removing all the eventlisteners that happened on player one's turn.
   $('#board').off();
   $(`#timer`).addClass('hide');
   let tempArray = passWallsToArray(); //This array holds the returned array.
   pathBackTotal = verifyValidPath(tempArray[0], tempArray[1], tempArray[2]);
-  //Hides the board so it can't be seen by player 2.
-//  board.classList.toggle('hide');
   //This will remove the old board and then call the function to make the player 2 board.
   $('#board').remove();
   makePlayerTwoBoard(tempArray[0], tempArray[1], tempArray[2]);
@@ -283,12 +278,12 @@ function turnIsOver() {
   }, 3000);
 }
 
-//Function 6 - This function hides the timeUpScreen and makes the board visible again. If then calls the function to show the player a timer - createTimer(), and passes it 30 seconds. It also has a window.setTimeout that calls the function gameIsOver() after 30 seconds. Finally, if we are in twoPlayerMode it adds an eventListener that calls the function - makeEnemyLine() when the board is clicked. (If we are not in twoPlayerMode, it will draw the enemy line at an interval determined in the options.)
+//Function 6 -
 function playerTwoTurn() {
   $(`#timeUpScreen`).addClass('hide');
   $(`#board`).removeClass('hide');
-  createTimer(30000); //Note this is temporarily set to 10 seconds.
-  window.setTimeout(gameIsOver, 30000); //Note this is temporarily set to 10 seconds
+  createTimer(30000); //Creates the visible timer with a 30 second countdown.
+  window.setTimeout(gameIsOver, 30000); //The real 30 second timer to end game.
   if (twoPlayerMode) {
     enemyDrawNow();
   } else {
@@ -305,11 +300,12 @@ function playerTwoTurn() {
 }
 
 
-//Function 7 - This function allows the enemy (player 2) to draw their line to the player's pixel. It first creates an array of the pixels that are directly around the original enemy pixel. If the enemy has clicked on any of the pixels that are in the array, that pixel is then part of the enemy's "line" and the pixels around that new enemy pixel are added to the array. If enemy's pixel reaches the player pixel before the time is up, global variable "winner" is set to "2" and gameisOver() is called.
+//Function 7 - This function draws Player 2's line to Player 1's pixel. It first creates an array of the pixels that are directly around Player 2's pixel. If Player 2 has clicked or dragged on any of the pixels that are in the array, that pixel is then part of the Player 2's "line" and the pixels around that new part of the line are added to the array. If Player 2's pixel reaches Player 1's pixel before the time is up, global variable "winner" is set to "2" and gameisOver() is called.
 function makeEnemyLine() {
   let square = document.getElementById(event.target.id);
-  //The following IF statement makes sure the player isn't selecting the actual player or enemy pixel.
   let enemyBuffer = [];
+
+  //This goes through the entire board and checks to see which pixels are near the enemy and can thus be part of the enemy's line.
   for (i=0; i<400; i++) {
     if ($(`#pixel${i}`).hasClass('enemy')) {
       enemyBuffer.push(`pixel${(i)}`);
@@ -323,15 +319,14 @@ function makeEnemyLine() {
       enemyBuffer.push(`pixel${(i+21)}`);
     }
   }
-//  console.log(enemyBuffer);
 
-
+  //This makes sure that the target location is not a wall and is one of the valid targets in the buffer.
   if ((!($(`#${event.target.id}`).hasClass('wall'))) && (enemyBuffer.includes(event.target.id))) {
     square.classList.add('enemy');
   }
 
+  //This checks to see if Player 2 has reached Player 1's pixel.
   if (($(`#${event.target.id}`).hasClass('player')) && (enemyBuffer.includes(event.target.id))) {
-//    console.log('Player 2 Wins!');
     winner = 2;
     gameIsOver();
   }
