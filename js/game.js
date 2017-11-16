@@ -305,7 +305,7 @@ Game Start! -
           clearInterval(aiAttack);
           gameIsOver();
         }
-      }, 300);
+      }, 200);
     }
   }
 
