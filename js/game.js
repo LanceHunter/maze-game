@@ -196,24 +196,18 @@ function startScreen() {
     if (twoPlayerMode) {
       $('#onePlayerText').toggleClass('hide');
       $('#twoPlayerText').toggleClass('hide');
-//      console.log('Changed to 1 player mode!');
       twoPlayerMode = false;
     } else {
       $('#onePlayerText').toggleClass('hide');
       $('#twoPlayerText').toggleClass('hide');
-//      console.log('Changed to 2 player mode!');
       twoPlayerMode = true;
     }
   });
-
 
   //Creating a click listener for the tutorial button that loads the tutorial page.
   let $tutorialButton = $('#tutorialButton');
 //  $tutorialButton.append(`<a href='./tutorial.html'></a>`);
   $tutorialButton.append(`<span class='insideButton'>Tips</span>`);
-//  $tutorialButton.click(function() {
-//    $(`body`).load(`./tutorial.html`);
-//  });
 
 }
 
