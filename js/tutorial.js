@@ -1,4 +1,4 @@
-//This is a basic big of Javascript that is used to make sure the toasts work on the tutorial page.
+//This is a basic bit of Javascript that is used to make sure the toasts work on the tutorial page.
 
 (function() {
   //Getting the 'About' link.

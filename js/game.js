@@ -136,497 +136,525 @@ Game Start! -
 
 (function() {
 
-//Prologue - global variables
+  //Prologue - global variables
 
-//Getting the game div from the page.
-let game = $('#game');
-let winner = 1;
-let twoPlayerMode = false;
-let pathBackTotal;
-let gameEnded = false;
-
-
-
-// Function 1 -
-
-function startScreen() {
-  //Creating the blank white Start Page background.
-  let startPage = document.createElement('div');
-  startPage.classList.add('startPage');
-  startPage.classList.add('center');
-  startPage.id = `startPage`;
-  game.append(startPage);
-
-  //Creating the start button.
-  let startButton = document.createElement('div');
-  startButton.classList.add('startButton');
-  startButton.classList.add('center-align');
-  startButton.classList.add('valign-wrapper');
-  startButton.id = `startButton`;
-
-  //Creating the button that toggles between 1-player and 2-player mode.
-  let twoPlayerModeButton = document.createElement('div');
-  twoPlayerModeButton.classList.add('twoPlayerModeButton');
-  twoPlayerModeButton.classList.add('center');
-  twoPlayerModeButton.classList.add('valign-wrapper');
-  twoPlayerModeButton.id = `twoPlayerModeButton`;
-
-  //Creating the tutorial button.
-  let tutorialPageLink = document.createElement('a');
-  tutorialPageLink.href= `./tutorial.html`;
-  tutorialPageLink.id= `tutorialPageLink`;
-  tutorialPageLink.classList.add('tutorialPageLink');
-  tutorialPageLink.classList.add('valign-wrapper');
-  tutorialPageLink.classList.add('black-text');
-  let tutorialButton = document.createElement('div');
-  tutorialButton.classList.add('tutorialButton');
-  tutorialButton.id = `tutorialButton`;
-  tutorialPageLink.append(tutorialButton);
+  //Getting the game div from the page.
+  let game = $('#game');
+  let winner = 1;
+  let twoPlayerMode = false;
+  let pathBackTotal;
+  let gameEnded = false;
 
 
-  //Adding the title, start button, and option button to the start screen div.
-  startPage.append(startButton);
-  startPage.append(twoPlayerModeButton);
-  startPage.append(tutorialPageLink);
 
-  //Creating a click listener for the start button that begins the game.
-  let $startButton = $('#startButton');
-  $startButton.append(`<span class='insideButton'>Start</span>`);
-  $startButton.click(function() {
-    startPage.classList.toggle('hide');
-    startGame();
-  });
+  // Function 1 -
 
-  //Creating a click listener for the twoPlayerMade button that toggles between 1 and 2 player mode the start page back.
-  let $twoPlayerModeButton = $('#twoPlayerModeButton');
-  $twoPlayerModeButton.append(`<span class='insideButton' id='onePlayerText'>1<br>Player<br>Mode</span>`);
-  $twoPlayerModeButton.append(`<span class='insideButton hide' id='twoPlayerText'>2<br>Player<br>Mode</span>`);
-  $twoPlayerModeButton.click(function() {
-    if (twoPlayerMode) {
-      $('#onePlayerText').toggleClass('hide');
-      $('#twoPlayerText').toggleClass('hide');
-      twoPlayerMode = false;
-    } else {
-      $('#onePlayerText').toggleClass('hide');
-      $('#twoPlayerText').toggleClass('hide');
-      twoPlayerMode = true;
-    }
-  });
+  function startScreen() {
+    //Creating the blank white Start Page background.
+    let startPage = document.createElement('div');
+    startPage.classList.add('startPage');
+    startPage.classList.add('center');
+    startPage.id = `startPage`;
+    game.append(startPage);
 
-  //Creating text for the Tips/tutorial button.
-  let $tutorialButton = $('#tutorialButton');
-  $tutorialButton.append(`<span class='insideButton'>Tips</span>`);
+    //Creating the start button.
+    let startButton = document.createElement('div');
+    startButton.classList.add('startButton');
+    startButton.classList.add('center-align');
+    startButton.classList.add('valign-wrapper');
+    startButton.id = `startButton`;
 
-}
+    //Creating the button that toggles between 1-player and 2-player mode.
+    let twoPlayerModeButton = document.createElement('div');
+    twoPlayerModeButton.classList.add('twoPlayerModeButton');
+    twoPlayerModeButton.classList.add('center');
+    twoPlayerModeButton.classList.add('valign-wrapper');
+    twoPlayerModeButton.id = `twoPlayerModeButton`;
 
-
-//Function 2 -
-function startGame() {
-  if ($('#timeUpScreen').length !== 0) {
-    $('#timeUpScreen').off();
-  }
-  let startingPlaces = piecePlacement();
-  createBoard();
-  createTimer(60000); //Sending the visual timer 60 seconds for Player 1 turn.
-  window.setTimeout(turnIsOver, 60000); //The real timer that marks end of turn.
-  $(`#pixel${startingPlaces[0]}`).addClass('player');
-  let enemyStart = $(`#pixel${startingPlaces[1]}`);
-  enemyStart.addClass('enemy');
-  drawNow();
-}
+    //Creating the tutorial button.
+    let tutorialPageLink = document.createElement('a');
+    tutorialPageLink.href = `./tutorial.html`;
+    tutorialPageLink.id = `tutorialPageLink`;
+    tutorialPageLink.classList.add('tutorialPageLink');
+    tutorialPageLink.classList.add('valign-wrapper');
+    tutorialPageLink.classList.add('black-text');
+    let tutorialButton = document.createElement('div');
+    tutorialButton.classList.add('tutorialButton');
+    tutorialButton.id = `tutorialButton`;
+    tutorialPageLink.append(tutorialButton);
 
 
-//Function 3 -
-function createBoard() {
-  let board = document.createElement('div');
-  board.classList.add('board');
-  board.id = `board`;
-  game.append(board);
-  newBoard();
-}
+    //Adding the title, start button, and option button to the start screen div.
+    startPage.append(startButton);
+    startPage.append(twoPlayerModeButton);
+    startPage.append(tutorialPageLink);
 
-//Function 4 -
-function newBoard() {
-for (i=0; i<400; i++) {
-  let pixel = document.createElement('div');
-  pixel.classList.add('pixel');
-  pixel.id = `pixel${i}`;
-  board.append(pixel);
-  }
-}
+    //Creating a click listener for the start button that begins the game.
+    let $startButton = $('#startButton');
+    $startButton.append(`<span class='insideButton'>Start</span>`);
+    $startButton.click(function() {
+      startPage.classList.toggle('hide');
+      startGame();
+    });
 
-//Function 5 -
-function turnIsOver() {
-  //Removing all the eventlisteners that happened on player one's turn.
-  $('#board').off();
-  $(`#timer`).addClass('hide');
-  let tempArray = passWallsToArray(); //This array holds the returned array.
-  pathBackTotal = verifyValidPath(tempArray[0], tempArray[1], tempArray[2]);
-  //This will remove the old board and then call the function to make the player 2 board.
-  $('#board').remove();
-  makePlayerTwoBoard(tempArray[0], tempArray[1], tempArray[2]);
-
-  //Shows player a "Time Up" screen
-  let timeUpScreen = document.createElement('div');
-  timeUpScreen.classList.add('timeUpScreen');
-  timeUpScreen.classList.add('valign-wrapper');
-  timeUpScreen.id = `timeUpScreen`;
-  timeUpScreen.innerHTML = `<span class="insideButton">Time is up!</span>`;
-  game.prepend(timeUpScreen);
-  window.setTimeout(function() {
-    timeUpScreen.innerHTML = `<span class="insideButton center-align">Player 2 click to begin</span>`;
-    if (pathBackTotal) {
-      $(`#timeUpScreen`).click(playerTwoTurn);
-    } else {
-      winner = 2;
-      timeUpScreen.style.backgroundColor = "#e53935";
-      timeUpScreen.innerHTML = `<span class="insideButton center-align">No walling off!<br><br>Player 2 Wins!<br><br>Click to play again</span>`;
-      $(`#timeUpScreen`).click(function() {
-        location.reload(true);
-      }); //Need to update function!!!
-    }
-  }, 3000);
-}
-
-//Function 6 -
-function playerTwoTurn() {
-  $(`#timeUpScreen`).addClass('hide');
-  $(`#board`).removeClass('hide');
-  createTimer(30000); //Creates the visible timer with a 30 second countdown.
-  window.setTimeout(gameIsOver, 30000); //The real 30 second timer to end game.
-  if (twoPlayerMode) {
-    enemyDrawNow();
-  } else {
-    let aiAttack = window.setInterval(function() {
-      let changingPixel = pathBackTotal.shift();
-      $(changingPixel).addClass('enemy');
-      if ($(changingPixel).hasClass('player') && !gameEnded) {
-        winner = 2;
-        clearInterval(aiAttack);
-        gameIsOver();
-      }
-    }, 300);
-  }
-}
-
-
-//Function 7 -
-function makeEnemyLine() {
-  let square = document.getElementById(event.target.id);
-  let enemyBuffer = [];
-
-  //This goes through the entire board and checks to see which pixels are near the enemy and can thus be part of the enemy's line.
-  for (i=0; i<400; i++) {
-    if ($(`#pixel${i}`).hasClass('enemy')) {
-      enemyBuffer.push(`pixel${(i)}`);
-      enemyBuffer.push(`pixel${(i-1)}`);
-      enemyBuffer.push(`pixel${(i+1)}`);
-      enemyBuffer.push(`pixel${(i-21)}`);
-      enemyBuffer.push(`pixel${(i-20)}`);
-      enemyBuffer.push(`pixel${(i-19)}`);
-      enemyBuffer.push(`pixel${(i+19)}`);
-      enemyBuffer.push(`pixel${(i+20)}`);
-      enemyBuffer.push(`pixel${(i+21)}`);
-    }
-  }
-
-  //This makes sure that the target location is not a wall and is one of the valid targets in the buffer.
-  if ((!($(`#${event.target.id}`).hasClass('wall'))) && (enemyBuffer.includes(event.target.id))) {
-    square.classList.add('enemy');
-  }
-
-  //This checks to see if Player 2 has reached Player 1's pixel.
-  if (($(`#${event.target.id}`).hasClass('player')) && (enemyBuffer.includes(event.target.id))) {
-    winner = 2;
-    gameIsOver();
-  }
-}
-
-
-//Function 8 - This function sets the gameEnded boolean to TRUE. It then turns off all eventListeners for the board and the timeUpScreen. It also hides the board and removes the timer. Then, if the global variable "winner" is "1", the timeUpScreen changes to a "player 1 wins" screen. If global variable "winner" is "2", the timeUpScreen changes to a "player 2 wins" screen. It also creates a new eventlistener on the timeUpScreen that reloads the page if clicked.
-function gameIsOver() {
-  gameEnded = true;
-  $(`#board`).off();
-  $(`#timeUpScreen`).off();
-
-  board.classList.add('hide');
-  $('#timer').remove();
-  if (winner === 1) {
-    timeUpScreen.classList.remove('hide');
-    timeUpScreen.style.backgroundColor = "#4caf50";
-    timeUpScreen.innerHTML = `<span class="insideButton center-align">Player 1 Wins!<br><br>Click to play again</span>`;
-  } else {
-    timeUpScreen.classList.remove('hide');
-    timeUpScreen.style.backgroundColor = "#e53935";
-    timeUpScreen.innerHTML = `<span class="insideButton center-align">Player 2 Wins!<br><br>Click to play again</span>`;
-  }
-
-  $('#timeUpScreen').click(function() {
-    location.reload(true);
-  });
-}
-
-//Function 9 -
-function passWallsToArray() {
-  let wallsArray = [];
-  let enemyPoint = [];
-  let playerPoint = [];
-  for (i=0; i<20; i++) {
-    let rowArray = [];
-    for (j=0; j<20; j++) {
-      let pixelNum = (i*20)+(j);
-      if ($(`#pixel${pixelNum}`).hasClass('wall')) {
-        rowArray.push({'name': `#pixel${pixelNum}`, 'safe':false, 'distance':null, 'predecessor':null, 'coordinates': [i,j], 'visited':false});
-      } else if ($(`#pixel${pixelNum}`).hasClass('player')) {
-        rowArray.push({'name': `#pixel${pixelNum}`, 'safe':true, 'distance':null, 'predecessor':null, 'coordinates': [i,j], 'visited':false});
-        playerPoint.push(i);
-        playerPoint.push(j);
-      } else if ($(`#pixel${pixelNum}`).hasClass('enemy')) {
-        enemyPoint.push(i);
-        enemyPoint.push(j);
-        rowArray.push({'name': `#pixel${pixelNum}`, 'safe':true, 'distance':0, 'predecessor':null,'coordinates': [i,j], 'visited':false});
+    //Creating a click listener for the twoPlayerMade button that toggles between 1 and 2 player mode the start page back.
+    let $twoPlayerModeButton = $('#twoPlayerModeButton');
+    $twoPlayerModeButton.append(`<span class='insideButton' id='onePlayerText'>1<br>Player<br>Mode</span>`);
+    $twoPlayerModeButton.append(`<span class='insideButton hide' id='twoPlayerText'>2<br>Player<br>Mode</span>`);
+    $twoPlayerModeButton.click(function() {
+      if (twoPlayerMode) {
+        $('#onePlayerText').toggleClass('hide');
+        $('#twoPlayerText').toggleClass('hide');
+        twoPlayerMode = false;
       } else {
-        rowArray.push({'name': `#pixel${pixelNum}`, 'safe':true, 'distance':null, 'predecessor':null, 'coordinates': [i,j], 'visited':false});
+        $('#onePlayerText').toggleClass('hide');
+        $('#twoPlayerText').toggleClass('hide');
+        twoPlayerMode = true;
       }
-    }
-    wallsArray.push(rowArray);
-  }
-  return([wallsArray, enemyPoint, playerPoint]);
-}
+    });
 
-//Function 9.5 -
-function makePlayerTwoBoard(wallsArray, enemyPoint, playerPoint) {
-  let board = document.createElement('div');
-  board.classList.add('board');
-  board.id = `board`;
-  game.append(board);
-  let tempString = '';
-  for (i=0; i<20; i++) {
-    for (j=0; j<20; j++) {
+    //Creating text for the Tips/tutorial button.
+    let $tutorialButton = $('#tutorialButton');
+    $tutorialButton.append(`<span class='insideButton'>Tips</span>`);
+
+  }
+
+
+  //Function 2 -
+  function startGame() {
+    if ($('#timeUpScreen').length !== 0) {
+      $('#timeUpScreen').off();
+    }
+    let startingPlaces = piecePlacement();
+    createBoard();
+    createTimer(60000); //Sending the visual timer 60 seconds for Player 1 turn.
+    window.setTimeout(turnIsOver, 60000); //The real timer that marks end of turn.
+    $(`#pixel${startingPlaces[0]}`).addClass('player');
+    let enemyStart = $(`#pixel${startingPlaces[1]}`);
+    enemyStart.addClass('enemy');
+    drawNow();
+  }
+
+
+  //Function 3 -
+  function createBoard() {
+    let board = document.createElement('div');
+    board.classList.add('board');
+    board.id = `board`;
+    game.append(board);
+    newBoard();
+  }
+
+  //Function 4 -
+  function newBoard() {
+    for (i = 0; i < 400; i++) {
       let pixel = document.createElement('div');
       pixel.classList.add('pixel');
-      pixel.id = wallsArray[i][j].name.slice(1);
-      if (!wallsArray[i][j].safe) {
-        pixel.classList.add('wall');
-      }
+      pixel.id = `pixel${i}`;
       board.append(pixel);
     }
   }
-  let x = enemyPoint[0];
-  let y = enemyPoint[1];
-  $(wallsArray[x][y].name).addClass('enemy');
-  x = playerPoint[0];
-  y = playerPoint[1];
-  $(wallsArray[x][y].name).addClass('player');
-  $(`#board`).addClass('hide');
-}
 
-//Function 10 -
-function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
-  //BFS Pathfinding Algorithm ahoy!
-  let playerPointObject = wallsArray[(playerPoint[0])][(playerPoint[1])];
-  let queue = [];
-  queue.push(wallsArray[(enemyPoint[0])][(enemyPoint[1])]);
-  while ((queue.length !== 0) && !playerPointObject.visited) {
-    let currentSquare = queue.shift();
-    //This is where it gets weird...
+  //Function 5 -
+  function turnIsOver() {
+    //Removing all the eventlisteners that happened on player one's turn.
+    $('#board').off();
+    $(`#timer`).addClass('hide');
+    let tempArray = passWallsToArray(); //This array holds the returned array.
+    pathBackTotal = verifyValidPath(tempArray[0], tempArray[1], tempArray[2]);
+    //This will remove the old board and then call the function to make the player 2 board.
+    $('#board').remove();
+    makePlayerTwoBoard(tempArray[0], tempArray[1], tempArray[2]);
 
-    //First we verify that there is an upper-Left square.
-    if (((currentSquare.coordinates[0]-1)>=0) && ((currentSquare.coordinates[1]-1)>=0)) {
-      let upLeftSquare = wallsArray[(currentSquare.coordinates[0]-1)][(currentSquare.coordinates[1]-1)];
-      //Checking the upper-left square from the current square to see if it can be traversed and if it has been visited before..
-      if (upLeftSquare.safe && !upLeftSquare.visited)  {
-        upLeftSquare.visited = true;
-        upLeftSquare.predecessor = currentSquare.name;
-        upLeftSquare.predecessorCoordinates = currentSquare.coordinates;
-        upLeftSquare.distance = currentSquare.distance + 1;
-        queue.push(upLeftSquare);
+    //Shows player a "Time Up" screen
+    let timeUpScreen = document.createElement('div');
+    timeUpScreen.classList.add('timeUpScreen');
+    timeUpScreen.classList.add('valign-wrapper');
+    timeUpScreen.id = `timeUpScreen`;
+    timeUpScreen.innerHTML = `<span class="insideButton">Time is up!</span>`;
+    game.prepend(timeUpScreen);
+    window.setTimeout(function() {
+      timeUpScreen.innerHTML = `<span class="insideButton center-align">Player 2 click to begin</span>`;
+      if (pathBackTotal) {
+        $(`#timeUpScreen`).click(playerTwoTurn);
+      } else {
+        winner = 2;
+        timeUpScreen.style.backgroundColor = "#e53935";
+        timeUpScreen.innerHTML = `<span class="insideButton center-align">No walling off!<br><br>Player 2 Wins!<br><br>Click to play again</span>`;
+        $(`#timeUpScreen`).click(function() {
+          location.reload(true);
+        }); //Need to update function!!!
       }
-    }
-    //Then we verify that there is an upper-center square.
-    if ((currentSquare.coordinates[0]-1)>=0) {
-      let upCenterSquare = wallsArray[(currentSquare.coordinates[0]-1)][(currentSquare.coordinates[1])];
-      //Checking the upper-center square from the current square to see if it can be traversed and if it has been visited before.
-      if (upCenterSquare.safe && !upCenterSquare.visited)  {
-        upCenterSquare.visited = true;
-        upCenterSquare.predecessor = currentSquare.name;
-        upCenterSquare.predecessorCoordinates = currentSquare.coordinates;
-        upCenterSquare.distance = currentSquare.distance + 1;
-        queue.push(upCenterSquare);
-      }
-    }
-    //Then we verify that there is an upper-right square.
-    if (((currentSquare.coordinates[0]-1)>=0) && ((currentSquare.coordinates[1]+1)<=19)) {
-      let upRightSquare = wallsArray[(currentSquare.coordinates[0]-1)][(currentSquare.coordinates[1]+1)];
-      //Checking the upper-right square from the current square.
-      if (upRightSquare.safe && !upRightSquare.visited)  {
-        upRightSquare.visited = true;
-        upRightSquare.predecessor = currentSquare.name;
-        upRightSquare.predecessorCoordinates = currentSquare.coordinates;
-        upRightSquare.distance = currentSquare.distance + 1;
-        queue.push(upRightSquare);
-      }
-    }
-    //Then we verify that there is an center-left square.
-    if ((currentSquare.coordinates[1]-1)>=0) {
-      let centerLeftSquare = wallsArray[currentSquare.coordinates[0]][(currentSquare.coordinates[1]-1)];
-      //Checking the center-left square from the current square.
-      if (centerLeftSquare.safe && !centerLeftSquare.visited)  {
-        centerLeftSquare.visited = true;
-        centerLeftSquare.predecessor = currentSquare.name;
-        centerLeftSquare.predecessorCoordinates = currentSquare.coordinates;
-        centerLeftSquare.distance = currentSquare.distance + 1;
-        queue.push(centerLeftSquare);
-      }
-    }
-    //Then we verify that there is an center-right square.
-    if ((currentSquare.coordinates[1]+1)<=19) {
-      let centerRightSquare = wallsArray[currentSquare.coordinates[0]][(currentSquare.coordinates[1]+1)];
-      //Checking the center-right square from the current square.
-      if (centerRightSquare.safe && !centerRightSquare.visited)  {
-        centerRightSquare.visited = true;
-        centerRightSquare.predecessor = currentSquare.name;
-        centerRightSquare.predecessorCoordinates = currentSquare.coordinates;
-        centerRightSquare.distance = currentSquare.distance + 1;
-        queue.push(centerRightSquare);
-      }
-    }
-    //Then we verify that there is an bottom-left square.
-    if (((currentSquare.coordinates[0]+1)<=19) && ((currentSquare.coordinates[1]-1)>=0)) {
-      let bottomLeftSquare = wallsArray[(currentSquare.coordinates[0]+1)][(currentSquare.coordinates[1]-1)];
-      //Checking the bottom-left square from the current square.
-      if (bottomLeftSquare.safe && !bottomLeftSquare.visited)  {
-        bottomLeftSquare.visited = true;
-        bottomLeftSquare.predecessor = currentSquare.name;
-        bottomLeftSquare.predecessorCoordinates = currentSquare.coordinates;
-        bottomLeftSquare.distance = currentSquare.distance + 1;
-        queue.push(bottomLeftSquare);
-      }
-    }
-    //Then we verify that there is an bottom-center square.
-    if ((currentSquare.coordinates[0]+1)<=19) {
-      let bottomCenterSquare = wallsArray[(currentSquare.coordinates[0]+1)][(currentSquare.coordinates[1])];
-      //Checking the bottom-center square from the current square.
-      if (bottomCenterSquare.safe && !bottomCenterSquare.visited)  {
-        bottomCenterSquare.visited = true;
-        bottomCenterSquare.predecessor = currentSquare.name;
-        bottomCenterSquare.predecessorCoordinates = currentSquare.coordinates;
-        bottomCenterSquare.distance = currentSquare.distance + 1;
-        queue.push(bottomCenterSquare);
-      }
-    }
-    //Finally, we verify that there is an bottom-right square.
-    if (((currentSquare.coordinates[0]+1)<=19) && ((currentSquare.coordinates[1]+1)<=19)) {
-      let bottomRightSquare = wallsArray[(currentSquare.coordinates[0]+1)][(currentSquare.coordinates[1]+1)];
-      //Checking the bottom-right square from the current square.
-      if (bottomRightSquare.safe && !bottomRightSquare.visited)  {
-        bottomRightSquare.visited = true;
-        bottomRightSquare.predecessor = currentSquare.name;
-        bottomRightSquare.predecessorCoordinates = currentSquare.coordinates;
-        bottomRightSquare.distance = currentSquare.distance + 1;
-        queue.push(bottomRightSquare);
-      }
-    }
+    }, 3000);
   }
 
-  //We have now found if there is a path. We will now check to see if there path is there by seeing if the playerPointObject was visited...
-  if (!playerPointObject.visited) {
-    //If it wasn't, there is no path and we return 'False'.
-    return false;
-  } else {
-    //If there was, then we return an array of the path from the enemy to the player.
-    let pathBack = [];
-    pathBack.unshift(playerPointObject.name);
-    let pathBackSpot = playerPointObject.predecessorCoordinates;
-    for (i = 0; i< playerPointObject.distance; i++) {
-      pathBack.unshift(wallsArray[pathBackSpot[0]][pathBackSpot[1]].name);
-//      console.log(wallsArray[pathBackSpot[0]][pathBackSpot[1]].predecessorCoordinates);
-//      console.log(pathBack);
-      pathBackSpot = wallsArray[pathBackSpot[0]][pathBackSpot[1]].predecessorCoordinates;
-    }
-    return(pathBack);
-  }
-
-}
-
-
-//Function 11 -
-function createTimer(timeLeft) {
-  let visibleTimer = document.createElement('div');
-  game.append(visibleTimer);
-  visibleTimer.classList.add('timer');
-  visibleTimer.classList.add('grey-text');
-  visibleTimer.classList.add('text-lighten-4');
-  visibleTimer.classList.add('center');
-  visibleTimer.id = `timer`;
-  let counter = setInterval(function() {
-    if (timeLeft>=1000) {
-      visibleTimer.innerText = `${(timeLeft/1000).toPrecision(3)} seconds`;
-      timeLeft = timeLeft-10;
-    } else if (timeLeft>=100) {
-      visibleTimer.innerText = `${(timeLeft/1000).toPrecision(2)} seconds`;
-      timeLeft = timeLeft-10;
-    } else if (timeLeft>=0) {
-      visibleTimer.innerText = `${(timeLeft/1000).toPrecision(1)} seconds`;
-      timeLeft = timeLeft-10;
+  //Function 6 -
+  function playerTwoTurn() {
+    $(`#timeUpScreen`).addClass('hide');
+    $(`#board`).removeClass('hide');
+    createTimer(30000); //Creates the visible timer with a 30 second countdown.
+    window.setTimeout(gameIsOver, 30000); //The real 30 second timer to end game.
+    if (twoPlayerMode) {
+      enemyDrawNow();
     } else {
-      clearInterval(counter);
-      $('#timer').remove();
+      let aiAttack = window.setInterval(function() {
+        let changingPixel = pathBackTotal.shift();
+        $(changingPixel).addClass('enemy');
+        if ($(changingPixel).hasClass('player') && !gameEnded) {
+          winner = 2;
+          clearInterval(aiAttack);
+          gameIsOver();
+        }
+      }, 300);
     }
-  }, 10);
-}
-
-//Function 12 -
-function piecePlacement() {
-  let enemyPixel = Math.floor(Math.random()*400);
-  let enemyBuffer = [(enemyPixel-1),(enemyPixel+1),(enemyPixel-21),(enemyPixel-20),(enemyPixel-19),(enemyPixel+19),(enemyPixel+20),(enemyPixel+21)];
-  let playerPixel = Math.floor(Math.random()*100);
-  while (enemyBuffer.includes(playerPixel)) {
-    playerPixel = Math.floor(Math.random()*100);
   }
-  return([playerPixel,enemyPixel]);
-}
 
-//Function 13 -
-function drawNow() {
-  $(`#board`).click(makeWall);
-  $(`#board`).mousedown(dragToDraw);
-}
 
-//Function 13.5 -
-function enemyDrawNow() {
-  $(`#board`).click(makeEnemyLine);
-  $(`#board`).mousedown(dragToDrawEnemy);
-}
+  //Function 7 -
+  function makeEnemyLine() {
+    let square = document.getElementById(event.target.id);
+    let enemyBuffer = [];
 
-//Function 14 -
-function makeWall() {
-  let square = document.getElementById(event.target.id);
-  //The following IF statement makes sure the player isn't selecting the actual player or enemy pixel.
-  if (!($(`#${event.target.id}`).hasClass('player')) && !($(`#${event.target.id}`).hasClass('enemy'))) {
-    square.classList.toggle('wall');
+    //This goes through the entire board and checks to see which pixels are near the enemy and can thus be part of the enemy's line.
+    for (i = 0; i < 400; i++) {
+      if ($(`#pixel${i}`).hasClass('enemy')) {
+        enemyBuffer.push(`pixel${(i)}`);
+        enemyBuffer.push(`pixel${(i-1)}`);
+        enemyBuffer.push(`pixel${(i+1)}`);
+        enemyBuffer.push(`pixel${(i-21)}`);
+        enemyBuffer.push(`pixel${(i-20)}`);
+        enemyBuffer.push(`pixel${(i-19)}`);
+        enemyBuffer.push(`pixel${(i+19)}`);
+        enemyBuffer.push(`pixel${(i+20)}`);
+        enemyBuffer.push(`pixel${(i+21)}`);
+      }
+    }
+
+    //This makes sure that the target location is not a wall and is one of the valid targets in the buffer.
+    if ((!($(`#${event.target.id}`).hasClass('wall'))) && (enemyBuffer.includes(event.target.id))) {
+      square.classList.add('enemy');
+    }
+
+    //This checks to see if Player 2 has reached Player 1's pixel.
+    if (($(`#${event.target.id}`).hasClass('player')) && (enemyBuffer.includes(event.target.id))) {
+      winner = 2;
+      gameIsOver();
+    }
   }
-}
 
-//Function 15 -
-function dragToDraw() {
-  $(`#board`).mouseover(makeWall);
-  $(`#board`).mouseup(function() {
+
+  //Function 8 - This function sets the gameEnded boolean to TRUE. It then turns off all eventListeners for the board and the timeUpScreen. It also hides the board and removes the timer. Then, if the global variable "winner" is "1", the timeUpScreen changes to a "player 1 wins" screen. If global variable "winner" is "2", the timeUpScreen changes to a "player 2 wins" screen. It also creates a new eventlistener on the timeUpScreen that reloads the page if clicked.
+  function gameIsOver() {
+    gameEnded = true;
     $(`#board`).off();
-    drawNow();
-  });
-}
+    $(`#timeUpScreen`).off();
 
-//Function 16 - Allowing drag-to-draw for creating enemy line. This creates eventlisteners for mouseover that calls makeEnemyLine() for each instance while the mouse is down.
-function dragToDrawEnemy() {
-  $(`#board`).mouseover(makeEnemyLine);
-  $(`#board`).mouseup(function() {
-    $(`#board`).off();
-    enemyDrawNow();
-  });
-}
+    board.classList.add('hide');
+    $('#timer').remove();
+    if (winner === 1) {
+      timeUpScreen.classList.remove('hide');
+      timeUpScreen.style.backgroundColor = "#4caf50";
+      timeUpScreen.innerHTML = `<span class="insideButton center-align">Player 1 Wins!<br><br>Click to play again</span>`;
+    } else {
+      timeUpScreen.classList.remove('hide');
+      timeUpScreen.style.backgroundColor = "#e53935";
+      timeUpScreen.innerHTML = `<span class="insideButton center-align">Player 2 Wins!<br><br>Click to play again</span>`;
+    }
 
-//Epilogue - The following are functions dealing with Materialize and links on the page outside the actual game.
+    $('#timeUpScreen').click(function() {
+      location.reload(true);
+    });
+  }
+
+  //Function 9 -
+  function passWallsToArray() {
+    let wallsArray = [];
+    let enemyPoint = [];
+    let playerPoint = [];
+    for (i = 0; i < 20; i++) {
+      let rowArray = [];
+      for (j = 0; j < 20; j++) {
+        let pixelNum = (i * 20) + (j);
+        if ($(`#pixel${pixelNum}`).hasClass('wall')) {
+          rowArray.push({
+            'name': `#pixel${pixelNum}`,
+            'safe': false,
+            'distance': null,
+            'predecessor': null,
+            'coordinates': [i, j],
+            'visited': false
+          });
+        } else if ($(`#pixel${pixelNum}`).hasClass('player')) {
+          rowArray.push({
+            'name': `#pixel${pixelNum}`,
+            'safe': true,
+            'distance': null,
+            'predecessor': null,
+            'coordinates': [i, j],
+            'visited': false
+          });
+          playerPoint.push(i);
+          playerPoint.push(j);
+        } else if ($(`#pixel${pixelNum}`).hasClass('enemy')) {
+          enemyPoint.push(i);
+          enemyPoint.push(j);
+          rowArray.push({
+            'name': `#pixel${pixelNum}`,
+            'safe': true,
+            'distance': 0,
+            'predecessor': null,
+            'coordinates': [i, j],
+            'visited': false
+          });
+        } else {
+          rowArray.push({
+            'name': `#pixel${pixelNum}`,
+            'safe': true,
+            'distance': null,
+            'predecessor': null,
+            'coordinates': [i, j],
+            'visited': false
+          });
+        }
+      }
+      wallsArray.push(rowArray);
+    }
+    return ([wallsArray, enemyPoint, playerPoint]);
+  }
+
+  //Function 9.5 -
+  function makePlayerTwoBoard(wallsArray, enemyPoint, playerPoint) {
+    let board = document.createElement('div');
+    board.classList.add('board');
+    board.id = `board`;
+    game.append(board);
+    let tempString = '';
+    for (i = 0; i < 20; i++) {
+      for (j = 0; j < 20; j++) {
+        let pixel = document.createElement('div');
+        pixel.classList.add('pixel');
+        pixel.id = wallsArray[i][j].name.slice(1);
+        if (!wallsArray[i][j].safe) {
+          pixel.classList.add('wall');
+        }
+        board.append(pixel);
+      }
+    }
+    let x = enemyPoint[0];
+    let y = enemyPoint[1];
+    $(wallsArray[x][y].name).addClass('enemy');
+    x = playerPoint[0];
+    y = playerPoint[1];
+    $(wallsArray[x][y].name).addClass('player');
+    $(`#board`).addClass('hide');
+  }
+
+  //Function 10 -
+  function verifyValidPath(wallsArray, enemyPoint, playerPoint) {
+    //BFS Pathfinding Algorithm ahoy!
+    let playerPointObject = wallsArray[(playerPoint[0])][(playerPoint[1])];
+    let queue = [];
+    queue.push(wallsArray[(enemyPoint[0])][(enemyPoint[1])]);
+    while ((queue.length !== 0) && !playerPointObject.visited) {
+      let currentSquare = queue.shift();
+      //This is where it gets weird...
+
+      //First we verify that there is an upper-Left square.
+      if (((currentSquare.coordinates[0] - 1) >= 0) && ((currentSquare.coordinates[1] - 1) >= 0)) {
+        let upLeftSquare = wallsArray[(currentSquare.coordinates[0] - 1)][(currentSquare.coordinates[1] - 1)];
+        //Checking the upper-left square from the current square to see if it can be traversed and if it has been visited before..
+        if (upLeftSquare.safe && !upLeftSquare.visited) {
+          upLeftSquare.visited = true;
+          upLeftSquare.predecessor = currentSquare.name;
+          upLeftSquare.predecessorCoordinates = currentSquare.coordinates;
+          upLeftSquare.distance = currentSquare.distance + 1;
+          queue.push(upLeftSquare);
+        }
+      }
+      //Then we verify that there is an upper-center square.
+      if ((currentSquare.coordinates[0] - 1) >= 0) {
+        let upCenterSquare = wallsArray[(currentSquare.coordinates[0] - 1)][(currentSquare.coordinates[1])];
+        //Checking the upper-center square from the current square to see if it can be traversed and if it has been visited before.
+        if (upCenterSquare.safe && !upCenterSquare.visited) {
+          upCenterSquare.visited = true;
+          upCenterSquare.predecessor = currentSquare.name;
+          upCenterSquare.predecessorCoordinates = currentSquare.coordinates;
+          upCenterSquare.distance = currentSquare.distance + 1;
+          queue.push(upCenterSquare);
+        }
+      }
+      //Then we verify that there is an upper-right square.
+      if (((currentSquare.coordinates[0] - 1) >= 0) && ((currentSquare.coordinates[1] + 1) <= 19)) {
+        let upRightSquare = wallsArray[(currentSquare.coordinates[0] - 1)][(currentSquare.coordinates[1] + 1)];
+        //Checking the upper-right square from the current square.
+        if (upRightSquare.safe && !upRightSquare.visited) {
+          upRightSquare.visited = true;
+          upRightSquare.predecessor = currentSquare.name;
+          upRightSquare.predecessorCoordinates = currentSquare.coordinates;
+          upRightSquare.distance = currentSquare.distance + 1;
+          queue.push(upRightSquare);
+        }
+      }
+      //Then we verify that there is an center-left square.
+      if ((currentSquare.coordinates[1] - 1) >= 0) {
+        let centerLeftSquare = wallsArray[currentSquare.coordinates[0]][(currentSquare.coordinates[1] - 1)];
+        //Checking the center-left square from the current square.
+        if (centerLeftSquare.safe && !centerLeftSquare.visited) {
+          centerLeftSquare.visited = true;
+          centerLeftSquare.predecessor = currentSquare.name;
+          centerLeftSquare.predecessorCoordinates = currentSquare.coordinates;
+          centerLeftSquare.distance = currentSquare.distance + 1;
+          queue.push(centerLeftSquare);
+        }
+      }
+      //Then we verify that there is an center-right square.
+      if ((currentSquare.coordinates[1] + 1) <= 19) {
+        let centerRightSquare = wallsArray[currentSquare.coordinates[0]][(currentSquare.coordinates[1] + 1)];
+        //Checking the center-right square from the current square.
+        if (centerRightSquare.safe && !centerRightSquare.visited) {
+          centerRightSquare.visited = true;
+          centerRightSquare.predecessor = currentSquare.name;
+          centerRightSquare.predecessorCoordinates = currentSquare.coordinates;
+          centerRightSquare.distance = currentSquare.distance + 1;
+          queue.push(centerRightSquare);
+        }
+      }
+      //Then we verify that there is an bottom-left square.
+      if (((currentSquare.coordinates[0] + 1) <= 19) && ((currentSquare.coordinates[1] - 1) >= 0)) {
+        let bottomLeftSquare = wallsArray[(currentSquare.coordinates[0] + 1)][(currentSquare.coordinates[1] - 1)];
+        //Checking the bottom-left square from the current square.
+        if (bottomLeftSquare.safe && !bottomLeftSquare.visited) {
+          bottomLeftSquare.visited = true;
+          bottomLeftSquare.predecessor = currentSquare.name;
+          bottomLeftSquare.predecessorCoordinates = currentSquare.coordinates;
+          bottomLeftSquare.distance = currentSquare.distance + 1;
+          queue.push(bottomLeftSquare);
+        }
+      }
+      //Then we verify that there is an bottom-center square.
+      if ((currentSquare.coordinates[0] + 1) <= 19) {
+        let bottomCenterSquare = wallsArray[(currentSquare.coordinates[0] + 1)][(currentSquare.coordinates[1])];
+        //Checking the bottom-center square from the current square.
+        if (bottomCenterSquare.safe && !bottomCenterSquare.visited) {
+          bottomCenterSquare.visited = true;
+          bottomCenterSquare.predecessor = currentSquare.name;
+          bottomCenterSquare.predecessorCoordinates = currentSquare.coordinates;
+          bottomCenterSquare.distance = currentSquare.distance + 1;
+          queue.push(bottomCenterSquare);
+        }
+      }
+      //Finally, we verify that there is an bottom-right square.
+      if (((currentSquare.coordinates[0] + 1) <= 19) && ((currentSquare.coordinates[1] + 1) <= 19)) {
+        let bottomRightSquare = wallsArray[(currentSquare.coordinates[0] + 1)][(currentSquare.coordinates[1] + 1)];
+        //Checking the bottom-right square from the current square.
+        if (bottomRightSquare.safe && !bottomRightSquare.visited) {
+          bottomRightSquare.visited = true;
+          bottomRightSquare.predecessor = currentSquare.name;
+          bottomRightSquare.predecessorCoordinates = currentSquare.coordinates;
+          bottomRightSquare.distance = currentSquare.distance + 1;
+          queue.push(bottomRightSquare);
+        }
+      }
+    }
+
+    //We have now found if there is a path. We will now check to see if there path is there by seeing if the playerPointObject was visited...
+    if (!playerPointObject.visited) {
+      //If it wasn't, there is no path and we return 'False'.
+      return false;
+    } else {
+      //If there was, then we return an array of the path from the enemy to the player.
+      let pathBack = [];
+      pathBack.unshift(playerPointObject.name);
+      let pathBackSpot = playerPointObject.predecessorCoordinates;
+      for (i = 0; i < playerPointObject.distance; i++) {
+        pathBack.unshift(wallsArray[pathBackSpot[0]][pathBackSpot[1]].name);
+        //      console.log(wallsArray[pathBackSpot[0]][pathBackSpot[1]].predecessorCoordinates);
+        //      console.log(pathBack);
+        pathBackSpot = wallsArray[pathBackSpot[0]][pathBackSpot[1]].predecessorCoordinates;
+      }
+      return (pathBack);
+    }
+
+  }
+
+
+  //Function 11 -
+  function createTimer(timeLeft) {
+    let visibleTimer = document.createElement('div');
+    game.append(visibleTimer);
+    visibleTimer.classList.add('timer');
+    visibleTimer.classList.add('grey-text');
+    visibleTimer.classList.add('text-lighten-4');
+    visibleTimer.classList.add('center');
+    visibleTimer.id = `timer`;
+    let counter = setInterval(function() {
+      if (timeLeft >= 1000) {
+        visibleTimer.innerText = `${(timeLeft/1000).toPrecision(3)} seconds`;
+        timeLeft = timeLeft - 10;
+      } else if (timeLeft >= 100) {
+        visibleTimer.innerText = `${(timeLeft/1000).toPrecision(2)} seconds`;
+        timeLeft = timeLeft - 10;
+      } else if (timeLeft >= 0) {
+        visibleTimer.innerText = `${(timeLeft/1000).toPrecision(1)} seconds`;
+        timeLeft = timeLeft - 10;
+      } else {
+        clearInterval(counter);
+        $('#timer').remove();
+      }
+    }, 10);
+  }
+
+  //Function 12 -
+  function piecePlacement() {
+    let enemyPixel = Math.floor(Math.random() * 400);
+    let enemyBuffer = [(enemyPixel - 1), (enemyPixel + 1), (enemyPixel - 21), (enemyPixel - 20), (enemyPixel - 19), (enemyPixel + 19), (enemyPixel + 20), (enemyPixel + 21)];
+    let playerPixel = Math.floor(Math.random() * 100);
+    while (enemyBuffer.includes(playerPixel)) {
+      playerPixel = Math.floor(Math.random() * 100);
+    }
+    return ([playerPixel, enemyPixel]);
+  }
+
+  //Function 13 -
+  function drawNow() {
+    $(`#board`).click(makeWall);
+    $(`#board`).mousedown(dragToDraw);
+  }
+
+  //Function 13.5 -
+  function enemyDrawNow() {
+    $(`#board`).click(makeEnemyLine);
+    $(`#board`).mousedown(dragToDrawEnemy);
+  }
+
+  //Function 14 -
+  function makeWall() {
+    let square = document.getElementById(event.target.id);
+    //The following IF statement makes sure the player isn't selecting the actual player or enemy pixel.
+    if (!($(`#${event.target.id}`).hasClass('player')) && !($(`#${event.target.id}`).hasClass('enemy'))) {
+      square.classList.toggle('wall');
+    }
+  }
+
+  //Function 15 -
+  function dragToDraw() {
+    $(`#board`).mouseover(makeWall);
+    $(`#board`).mouseup(function() {
+      $(`#board`).off();
+      drawNow();
+    });
+  }
+
+  //Function 16 - Allowing drag-to-draw for creating enemy line. This creates eventlisteners for mouseover that calls makeEnemyLine() for each instance while the mouse is down.
+  function dragToDrawEnemy() {
+    $(`#board`).mouseover(makeEnemyLine);
+    $(`#board`).mouseup(function() {
+      $(`#board`).off();
+      enemyDrawNow();
+    });
+  }
+
+  //Epilogue - The following are functions dealing with Materialize and links on the page outside the actual game.
 
   //Getting the 'About' link.
   let about = $('#about');
@@ -637,7 +665,7 @@ function dragToDrawEnemy() {
   });
 
 
-//Game Start! -
-startScreen();
+  //Game Start! -
+  startScreen();
 
 })();
