@@ -82,7 +82,7 @@ Function 10 - verifyValidPath()
 
 Function 11 - createTimer()
 
-  This function puts a timer on the page below the board so player can see how much time they of the enemy have left in their turn. It takes in an argument of how much time is left, which will either be 60000 for player or 30000 for enemy. It counts down with a setInterval that iterates every 10ms, reducing that amount from the amount of displayed time remaining. It will display down to the 1/10th of a second until there are <9 seconds remaining, then it will display to the 1/100th of a second.
+  This function puts a timer on the page below the board so player can see how much time they of the enemy have left in their turn. It takes in an argument of how much time is left, which will either be 120000 for player or 60000 for enemy. It counts down with a setInterval that iterates every 10ms, reducing that amount from the amount of displayed time remaining. It will display down to the 1/10th of a second until there are <9 seconds remaining, then it will display to the 1/100th of a second.
 
 ===========
 
@@ -227,8 +227,8 @@ Game Start! -
     }
     let startingPlaces = piecePlacement();
     createBoard();
-    createTimer(60000); //Sending the visual timer 60 seconds for Player 1 turn.
-    window.setTimeout(turnIsOver, 60000); //The real timer that marks end of turn.
+    createTimer(120000); //Sending the visual timer 120 seconds for Player 1 turn.
+    window.setTimeout(turnIsOver, 120000); //The real timer that marks end of turn.
     $(`#pixel${startingPlaces[0]}`).addClass('player');
     let enemyStart = $(`#pixel${startingPlaces[1]}`);
     enemyStart.addClass('enemy');
@@ -247,7 +247,7 @@ Game Start! -
 
   //Function 4 -
   function newBoard() {
-    for (i = 0; i < 400; i++) {
+    for (i = 0; i < 2500; i++) {
       let pixel = document.createElement('div');
       pixel.classList.add('pixel');
       pixel.id = `pixel${i}`;
@@ -292,8 +292,8 @@ Game Start! -
   function playerTwoTurn() {
     $(`#timeUpScreen`).addClass('hide');
     $(`#board`).removeClass('hide');
-    createTimer(30000); //Creates the visible timer with a 30 second countdown.
-    window.setTimeout(gameIsOver, 30000); //The real 30 second timer to end game.
+    createTimer(60000); //Creates the visible timer with a 30 second countdown.
+    window.setTimeout(gameIsOver, 60000); //The real 30 second timer to end game.
     if (twoPlayerMode) {
       enemyDrawNow();
     } else {
@@ -316,17 +316,17 @@ Game Start! -
     let enemyBuffer = [];
 
     //This goes through the entire board and checks to see which pixels are near the enemy and can thus be part of the enemy's line.
-    for (i = 0; i < 400; i++) {
+    for (i = 0; i < 2500; i++) {
       if ($(`#pixel${i}`).hasClass('enemy')) {
         enemyBuffer.push(`pixel${(i)}`);
         enemyBuffer.push(`pixel${(i-1)}`);
         enemyBuffer.push(`pixel${(i+1)}`);
-        enemyBuffer.push(`pixel${(i-21)}`);
-        enemyBuffer.push(`pixel${(i-20)}`);
-        enemyBuffer.push(`pixel${(i-19)}`);
-        enemyBuffer.push(`pixel${(i+19)}`);
-        enemyBuffer.push(`pixel${(i+20)}`);
-        enemyBuffer.push(`pixel${(i+21)}`);
+        enemyBuffer.push(`pixel${(i-51)}`);
+        enemyBuffer.push(`pixel${(i-50)}`);
+        enemyBuffer.push(`pixel${(i-59)}`);
+        enemyBuffer.push(`pixel${(i+59)}`);
+        enemyBuffer.push(`pixel${(i+50)}`);
+        enemyBuffer.push(`pixel${(i+51)}`);
       }
     }
 
@@ -371,10 +371,10 @@ Game Start! -
     let wallsArray = [];
     let enemyPoint = [];
     let playerPoint = [];
-    for (i = 0; i < 20; i++) {
+    for (i = 0; i < 50; i++) {
       let rowArray = [];
-      for (j = 0; j < 20; j++) {
-        let pixelNum = (i * 20) + (j);
+      for (j = 0; j < 50; j++) {
+        let pixelNum = (i * 50) + (j);
         if ($(`#pixel${pixelNum}`).hasClass('wall')) {
           rowArray.push({
             'name': `#pixel${pixelNum}`,
@@ -429,8 +429,8 @@ Game Start! -
     board.id = `board`;
     game.append(board);
     let tempString = '';
-    for (i = 0; i < 20; i++) {
-      for (j = 0; j < 20; j++) {
+    for (i = 0; i < 50; i++) {
+      for (j = 0; j < 50; j++) {
         let pixel = document.createElement('div');
         pixel.classList.add('pixel');
         pixel.id = wallsArray[i][j].name.slice(1);
@@ -484,7 +484,7 @@ Game Start! -
         }
       }
       //Then we verify that there is an upper-right square.
-      if (((currentSquare.coordinates[0] - 1) >= 0) && ((currentSquare.coordinates[1] + 1) <= 19)) {
+      if (((currentSquare.coordinates[0] - 1) >= 0) && ((currentSquare.coordinates[1] + 1) <= 49)) {
         let upRightSquare = wallsArray[(currentSquare.coordinates[0] - 1)][(currentSquare.coordinates[1] + 1)];
         //Checking the upper-right square from the current square.
         if (upRightSquare.safe && !upRightSquare.visited) {
@@ -508,7 +508,7 @@ Game Start! -
         }
       }
       //Then we verify that there is an center-right square.
-      if ((currentSquare.coordinates[1] + 1) <= 19) {
+      if ((currentSquare.coordinates[1] + 1) <= 49) {
         let centerRightSquare = wallsArray[currentSquare.coordinates[0]][(currentSquare.coordinates[1] + 1)];
         //Checking the center-right square from the current square.
         if (centerRightSquare.safe && !centerRightSquare.visited) {
@@ -520,7 +520,7 @@ Game Start! -
         }
       }
       //Then we verify that there is an bottom-left square.
-      if (((currentSquare.coordinates[0] + 1) <= 19) && ((currentSquare.coordinates[1] - 1) >= 0)) {
+      if (((currentSquare.coordinates[0] + 1) <= 49) && ((currentSquare.coordinates[1] - 1) >= 0)) {
         let bottomLeftSquare = wallsArray[(currentSquare.coordinates[0] + 1)][(currentSquare.coordinates[1] - 1)];
         //Checking the bottom-left square from the current square.
         if (bottomLeftSquare.safe && !bottomLeftSquare.visited) {
@@ -532,7 +532,7 @@ Game Start! -
         }
       }
       //Then we verify that there is an bottom-center square.
-      if ((currentSquare.coordinates[0] + 1) <= 19) {
+      if ((currentSquare.coordinates[0] + 1) <= 49) {
         let bottomCenterSquare = wallsArray[(currentSquare.coordinates[0] + 1)][(currentSquare.coordinates[1])];
         //Checking the bottom-center square from the current square.
         if (bottomCenterSquare.safe && !bottomCenterSquare.visited) {
@@ -544,7 +544,7 @@ Game Start! -
         }
       }
       //Finally, we verify that there is an bottom-right square.
-      if (((currentSquare.coordinates[0] + 1) <= 19) && ((currentSquare.coordinates[1] + 1) <= 19)) {
+      if (((currentSquare.coordinates[0] + 1) <= 49) && ((currentSquare.coordinates[1] + 1) <= 49)) {
         let bottomRightSquare = wallsArray[(currentSquare.coordinates[0] + 1)][(currentSquare.coordinates[1] + 1)];
         //Checking the bottom-right square from the current square.
         if (bottomRightSquare.safe && !bottomRightSquare.visited) {
@@ -607,7 +607,7 @@ Game Start! -
   //Function 12 -
   function piecePlacement() {
     let enemyPixel = Math.floor(Math.random() * 400);
-    let enemyBuffer = [(enemyPixel - 1), (enemyPixel + 1), (enemyPixel - 21), (enemyPixel - 20), (enemyPixel - 19), (enemyPixel + 19), (enemyPixel + 20), (enemyPixel + 21)];
+    let enemyBuffer = [(enemyPixel - 1), (enemyPixel + 1), (enemyPixel - 51), (enemyPixel - 50), (enemyPixel - 49), (enemyPixel + 49), (enemyPixel + 50), (enemyPixel + 51)];
     let playerPixel = Math.floor(Math.random() * 100);
     while (enemyBuffer.includes(playerPixel)) {
       playerPixel = Math.floor(Math.random() * 100);
