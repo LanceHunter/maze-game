@@ -163,27 +163,28 @@ function startScreen() {
   twoPlayerModeButton.id = `twoPlayerModeButton`;
 
   //Creating the tutorial button.
+  let tutorialPageLink = document.createElement('a');
+  tutorialPageLink.href= `./tutorial.html`;
+  tutorialPageLink.id= `tutorialPageLink`;
+  tutorialPageLink.classList.add('tutorialPageLink');
+  tutorialPageLink.classList.add('valign-wrapper');
+  tutorialPageLink.classList.add('black-text');
   let tutorialButton = document.createElement('div');
   tutorialButton.classList.add('tutorialButton');
-  tutorialButton.classList.add('valign-wrapper');
   tutorialButton.id = `tutorialButton`;
+  tutorialPageLink.append(tutorialButton);
 
-
-  //Creating the logo (and a helpful breakline insert).
-  let startLogo = document.createElement('h1');
-  let breakLine = document.createElement('br');
 
   //Adding the title, start button, and option button to the start screen div.
   startPage.append(startButton);
   startPage.append(twoPlayerModeButton);
-  startPage.append(tutorialButton);
+  startPage.append(tutorialPageLink);
 
   //Creating a click listener for the start button that begins the game.
   let $startButton = $('#startButton');
   $startButton.append(`<span class='insideButton'>Start</span>`);
   $startButton.click(function() {
     startPage.classList.toggle('hide');
-//    console.log('Start Button Pressed!');
     startGame();
   });
 
@@ -206,19 +207,18 @@ function startScreen() {
   });
 
 
-  //Creating a click listener for the tutorial button that opens the tutorial video.
+  //Creating a click listener for the tutorial button that loads the tutorial page.
   let $tutorialButton = $('#tutorialButton');
+//  $tutorialButton.append(`<a href='./tutorial.html'></a>`);
   $tutorialButton.append(`<span class='insideButton'>Tips</span>`);
-  $tutorialButton.click(function() {
-//    startPage.classList.toggle('hide');
-//    tutorialTime();
-  });
+//  $tutorialButton.click(function() {
+//    $(`body`).load(`./tutorial.html`);
+//  });
 
 }
 
 
-
-//Function 2 - This function starts the game, creating the board, placing the player and enemy pixels, starting the timer, and calling the function that allows player to draw walls.
+//Function 2 - This function starts the game, creating the board, placing the player and enemy pixels, starting the timer, and calling the function that allows the first player to draw walls.
 function startGame() {
   if ($('#timeUpScreen').length !== 0) {
     $('#timeUpScreen').off();
@@ -227,9 +227,9 @@ function startGame() {
   createBoard();
   createTimer(60000); //Note this is set to 10 seconds for now.
   window.setTimeout(turnIsOver, 60000); //Note this is set to 10 seconds for now.
-  let playerStart = $(`#pixel${startingPlaces[0]}`);
+  $(`#pixel${startingPlaces[0]}`).addClass('player');
   let enemyStart = $(`#pixel${startingPlaces[1]}`);
-  playerStart.addClass('player');
+//  playerStart;
   enemyStart.addClass('enemy');
   drawNow();
 }
