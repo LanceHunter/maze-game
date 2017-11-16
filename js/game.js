@@ -190,8 +190,8 @@ function startScreen() {
 
   //Creating a click listener for the twoPlayerMade button that toggles between 1 and 2 player mode the start page back.
   let $twoPlayerModeButton = $('#twoPlayerModeButton');
-  $twoPlayerModeButton.append(`<span class='insideButton' id='onePlayerText'>1 Player</span>`);
-  $twoPlayerModeButton.append(`<span class='insideButton hide' id='twoPlayerText'>2 Players</span>`);
+  $twoPlayerModeButton.append(`<span class='insideButton' id='onePlayerText'>1<br>Player<br>Mode</span>`);
+  $twoPlayerModeButton.append(`<span class='insideButton hide' id='twoPlayerText'>2<br>Player<br>Mode</span>`);
   $twoPlayerModeButton.click(function() {
     if (twoPlayerMode) {
       $('#onePlayerText').toggleClass('hide');
