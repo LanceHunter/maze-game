@@ -208,7 +208,7 @@ function startScreen() {
 
   //Creating a click listener for the tutorial button that opens the tutorial video.
   let $tutorialButton = $('#tutorialButton');
-  $tutorialButton.append(`<span class='insideButton'>Tutorial</span>`);
+  $tutorialButton.append(`<span class='insideButton'>Tips</span>`);
   $tutorialButton.click(function() {
 //    startPage.classList.toggle('hide');
 //    tutorialTime();
@@ -644,12 +644,12 @@ startScreen();
 
 // Epilogue - The following are functions dealing with Materialize and links on the page outside the actual game.
 
-//Getting the 'High Scores' links.
-let highScores = $('#highScores');
+//Getting the 'About' link.
+let highScores = $('#about');
 
-//Displays the high scores in a toast when the High Scores link is clicked.
+//Displays some basic information about the game in a toast when the About link is clicked.
 highScores.click(function() {
-  Materialize.toast(`<ol><h2>High Scores</h2><li>Testing</li><li>Still Testing</li></ol>`, 15000);
+  Materialize.toast(`<ul><h2>Maze Game</h2><li>My Q1 project for the Galvanize Web Development Intensive Program.</li><li>This project uses HTML5, Javascript, jQuery, Materialize, and Youtube's iFrame Player API</li></ul>`, 15000);
 });
 
 
