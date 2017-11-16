@@ -106,26 +106,30 @@ Function 13.5 - enemyDrawNow()
 
 Function 14 - makeWall()
 
-  This is the function called by the event listener in drawNow(). It toggles a wall on or off for whichever pixel the player has clicked, and makes sure that the player hasn't clicked their own pixel or the enemy pixel.
+  This is the function called by the first event listener in drawNow(). It toggles a wall on or off for whichever pixel the player has clicked, and makes sure that the player hasn't clicked their own pixel or the enemy pixel.
 
 ===========
 
 
 Function 15 -dragToDraw()
 
-  Allowing drag-to-draw for creating walls. This creates eventlisteners for mouseover that calls makeWall() for each instance while the mouse is down.
+  Allowing drag-to-draw for creating walls. This creates eventlisteners for mouseover that calls makeWall() for each instance while the mouse is down. It also creates an eventlistener for a mouseup that then turns off the eventlisteners for the board and re-calls the drawNow() function to restart those listeners fresh. This is the Player 1 version.
 
 ===========
 
 Function 16 dragToDrawEnemy()
 
-  Allowing drag-to-draw for creating enemy line. This creates eventlisteners for mouseover that calls makeEnemyLine() for each instance while the mouse is down.
-
-===========
+  Allowing drag-to-draw for creating enemy line. This creates eventlisteners for mouseover that calls makeEnemyLine() for each instance while the mouse is down. It also creates an eventlistener for a mouseup that then turns off the eventlisteners for the board and re-calls the enemyDrawNow() function to restart those listeners fresh. This is the Player 2 version.
 
 ===========
 
 Epilogue - Functions and variables that deal with clicks outside of the game. Mostly Materialize toasts.
+
+===========
+
+Game Start! -
+
+  Calling startScreen() to get things running.
 
 ===========
 */
@@ -589,14 +593,13 @@ function drawNow() {
   $(`#board`).mousedown(dragToDraw);
 }
 
-//Function 13.5 - This sets the eventlisteners that allow enemy to draw their line.
-
+//Function 13.5 -
 function enemyDrawNow() {
   $(`#board`).click(makeEnemyLine);
   $(`#board`).mousedown(dragToDrawEnemy);
 }
 
-//Function 14 - This is the function called by the event listener in drawNow().
+//Function 14 -
 function makeWall() {
   let square = document.getElementById(event.target.id);
   //The following IF statement makes sure the player isn't selecting the actual player or enemy pixel.
@@ -605,7 +608,7 @@ function makeWall() {
   }
 }
 
-//Function 15 - Allowing drag-to-draw for creating walls. This creates eventlisteners for mouseover that calls makeWall() for each instance while the mouse is down.
+//Function 15 -
 function dragToDraw() {
   $(`#board`).mouseover(makeWall);
   $(`#board`).mouseup(function() {
@@ -623,22 +626,18 @@ function dragToDrawEnemy() {
   });
 }
 
+//Epilogue - The following are functions dealing with Materialize and links on the page outside the actual game.
 
-//Calling startScreen now to run game while testing
+  //Getting the 'About' link.
+  let about = $('#about');
+
+  //Displays some basic information about the game in a toast when the About link is clicked.
+  about.click(function() {
+    Materialize.toast(`<ul><h2>Maze Game</h2><li>My Q1 project for the Galvanize Web Development Intensive Program.</li><li>This project uses HTML5, Javascript, jQuery, Materialize, and Youtube's iFrame Player API</li></ul>`, 15000);
+  });
+
+
+//Game Start! -
 startScreen();
-
-
-
-
-// Epilogue - The following are functions dealing with Materialize and links on the page outside the actual game.
-
-//Getting the 'About' link.
-let highScores = $('#about');
-
-//Displays some basic information about the game in a toast when the About link is clicked.
-highScores.click(function() {
-  Materialize.toast(`<ul><h2>Maze Game</h2><li>My Q1 project for the Galvanize Web Development Intensive Program.</li><li>This project uses HTML5, Javascript, jQuery, Materialize, and Youtube's iFrame Player API</li></ul>`, 15000);
-});
-
 
 })();
