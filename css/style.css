@@ -29,16 +29,16 @@ main {
 }
 
 .pixel {
-  width: 10px;
-  height: 10px;
+  width: 2%;
+  height: 2%;
   border: none;
   align-content: flex-start;
   background-color: white;
 }
 
 .board {
-  width: 500px;
-  height: 500px;
+  width: 600px;
+  height: 600px;
   border: none;
   display: flex;
   flex-wrap: wrap;
@@ -103,8 +103,8 @@ main {
 }
 
 .timeUpScreen {
-  width: 500px;
-  height: 500px;
+  width: 600px;
+  height: 600px;
   border: none;
   display: flex;
   flex-wrap: wrap;

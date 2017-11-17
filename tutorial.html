@@ -28,8 +28,8 @@
 
     <main>
       <div class="container z-depth-3 blue darken-3" id="tutorialContainer">
-        <div class="center white video-container hide" id="playerContainer">
-<!--          <div id="player"></div> -->
+        <div class="center white video-container" id="playerContainer">
+          <div id="player"></div>
         </div>
         <div class="white" id="tutorialText">
           <h2>Instructions</h2>
@@ -107,7 +107,7 @@
       player = new YT.Player('player', {
         height: '390',
         width: '640',
-        videoId: 'M7lc1UVf-VE',
+        videoId: '64yvBARYMxk',
         events: {
           'onReady': onPlayerReady,
           'onStateChange': onPlayerStateChange
@@ -115,12 +115,11 @@
       });
     }
     function onPlayerReady(event) {
-//      event.target.playVideo();
+//     event.target.playVideo(); (Decided against auto-play for this.)
     }
     let done = false;
     function onPlayerStateChange(event) {
       if (event.data == YT.PlayerState.PLAYING && !done) {
-        setTimeout(stopVideo, 6000);
         done = true;
       }
     }

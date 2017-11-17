@@ -238,8 +238,8 @@ Game Start! -
 
   //Function 3 -
   function createBoard() {
-    let board = document.createElement('div');
-    board.classList.add('board');
+    let board = document.createElement(`div`);
+    board.classList.add(`board`);
     board.id = `board`;
     game.append(board);
     newBoard();
